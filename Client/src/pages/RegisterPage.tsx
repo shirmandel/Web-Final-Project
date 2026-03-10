@@ -60,8 +60,6 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
     try {
       console.log("Register submitted:", { name, email, password });
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // TODO: replace with actual API call
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -89,7 +87,6 @@ const RegisterPage: React.FC = () => {
         p: 2,
       }}
     >
-      {/* Background blobs */}
       <Box
         sx={{
           position: "absolute",
