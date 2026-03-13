@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
   TextField,
@@ -17,13 +16,19 @@ import {
   VisibilityOff,
   Email as EmailIcon,
   Lock as LockIcon,
+  Person as PersonIcon,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +36,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    if (!email || !password) {
+    if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
@@ -42,20 +47,31 @@ const LoginPage: React.FC = () => {
       return;
     }
 
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
     try {
-      console.log("Login submitted:", { email, password });
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Register submitted:", { name, email, password });
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Login failed. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again.";
       setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleLogin = () => {};
+  const handleGoogleRegister = () => {};
 
   return (
     <Box
@@ -152,7 +168,7 @@ const LoginPage: React.FC = () => {
           textAlign="center"
           sx={{ mb: 4 }}
         >
-          Welcome back! Sign in to continue.
+          Create your account and get started.
         </Typography>
 
         {error && (
@@ -160,13 +176,34 @@ const LoginPage: React.FC = () => {
             severity="error"
             onClose={() => setError("")}
             sx={{ mb: 2.5 }}
-            id="login-error-alert"
+            id="register-error-alert"
           >
             {error}
           </Alert>
         )}
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
+          <TextField
+            label="Full Name"
+            type="text"
+            fullWidth
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            margin="normal"
+            required
+            id="register-name"
+            autoComplete="name"
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
           <TextField
             label="Email"
             type="email"
@@ -175,7 +212,7 @@ const LoginPage: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             margin="normal"
             required
-            id="login-email"
+            id="register-email"
             autoComplete="email"
             slotProps={{
               input: {
@@ -196,8 +233,8 @@ const LoginPage: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             margin="normal"
             required
-            id="login-password"
-            autoComplete="current-password"
+            id="register-password"
+            autoComplete="new-password"
             slotProps={{
               input: {
                 startAdornment: (
@@ -224,6 +261,44 @@ const LoginPage: React.FC = () => {
             }}
           />
 
+          <TextField
+            label="Confirm Password"
+            type={showConfirm ? "text" : "password"}
+            fullWidth
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            margin="normal"
+            required
+            id="register-confirm-password"
+            autoComplete="new-password"
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      edge="end"
+                      size="small"
+                      sx={{ color: "#94A3B8" }}
+                      aria-label={
+                        showConfirm
+                          ? "Hide confirm password"
+                          : "Show confirm password"
+                      }
+                    >
+                      {showConfirm ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
           <Button
             type="submit"
             variant="contained"
@@ -237,12 +312,12 @@ const LoginPage: React.FC = () => {
               fontSize: "1rem",
               position: "relative",
             }}
-            id="login-submit"
+            id="register-submit"
           >
             {loading ? (
               <CircularProgress size={24} sx={{ color: "white" }} />
             ) : (
-              "Sign In"
+              "Create Account"
             )}
           </Button>
         </Box>
@@ -260,7 +335,7 @@ const LoginPage: React.FC = () => {
         <Button
           fullWidth
           variant="outlined"
-          onClick={handleGoogleLogin}
+          onClick={handleGoogleRegister}
           sx={{
             py: 1.3,
             mb: 3,
@@ -274,7 +349,7 @@ const LoginPage: React.FC = () => {
               backgroundColor: "#FAFAFF",
             },
           }}
-          id="login-google"
+          id="register-google"
         >
           <Box
             component="img"
@@ -291,10 +366,10 @@ const LoginPage: React.FC = () => {
           color="text.secondary"
           sx={{ fontSize: "0.85rem" }}
         >
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <Box
             component="span"
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}
             sx={{
               color: "#7C3AED",
               cursor: "pointer",
@@ -304,7 +379,7 @@ const LoginPage: React.FC = () => {
               },
             }}
           >
-            Sign Up
+            Sign In
           </Box>
         </Typography>
       </Paper>
@@ -312,4 +387,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
