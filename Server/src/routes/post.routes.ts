@@ -12,8 +12,8 @@ import upload from '../middleware/upload.middleware';
 
 const router = Router();
 
-router.get('/', authMiddleware, getAllPosts);
-router.get('/:id', authMiddleware, getPostById);
+router.get('/', getAllPosts);
+router.get('/:id', getPostById);
 router.post('/', authMiddleware, upload.single('image'), createPost);
 router.put('/:id', authMiddleware, upload.single('image'), updatePost);
 router.delete('/:id', authMiddleware, deletePost);

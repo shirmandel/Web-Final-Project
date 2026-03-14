@@ -4,7 +4,7 @@ import authMiddleware from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.get('/:postId', authMiddleware, getCommentsByPost);
+router.get('/:postId', getCommentsByPost);
 router.post('/', authMiddleware, createComment);
 router.delete('/:id', authMiddleware, deleteComment);
 
