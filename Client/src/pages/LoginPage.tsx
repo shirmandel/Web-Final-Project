@@ -18,14 +18,16 @@ import {
   Email as EmailIcon,
   Lock as LockIcon,
 } from "@mui/icons-material";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +46,8 @@ const LoginPage: React.FC = () => {
 
     setLoading(true);
     try {
-      console.log("Login submitted:", { email, password });
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await login(email, password);
+      navigate("/");
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Login failed. Please try again.";
