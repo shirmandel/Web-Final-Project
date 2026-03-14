@@ -5,7 +5,7 @@ const router = Router();
 router.get("/", (_req: Request, res: Response) => {
   res.json({
     status: "ok",
-    message: "Server is running 🚀",
+    message: "Server is running",
   });
 });
 
