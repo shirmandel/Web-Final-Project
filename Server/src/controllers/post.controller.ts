@@ -4,29 +4,7 @@ import Comment from '../models/comment.model';
 import Like from '../models/like.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 
-/**
- * @swagger
- * /api/posts:
- *   get:
- *     summary: Get all posts with pagination
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *     responses:
- *       200:
- *         description: List of posts
- */
+
 export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -52,26 +30,7 @@ export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-/**
- * @swagger
- * /api/posts/{id}:
- *   get:
- *     summary: Get a single post
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Post details
- *       404:
- *         description: Post not found
- */
+
 export const getPostById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const post = await Post.findById(req.params.id).populate('owner', 'username profileImage');
@@ -85,35 +44,7 @@ export const getPostById = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-/**
- * @swagger
- * /api/posts:
- *   post:
- *     summary: Create a new post
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required:
- *               - title
- *               - content
- *             properties:
- *               title:
- *                 type: string
- *               content:
- *                 type: string
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       201:
- *         description: Post created
- */
+
 export const createPost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { title, content } = req.body;
@@ -139,41 +70,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-/**
- * @swagger
- * /api/posts/{id}:
- *   put:
- *     summary: Update a post (owner only)
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               content:
- *                 type: string
- *               image:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Post updated
- *       403:
- *         description: Not authorized
- *       404:
- *         description: Post not found
- */
+
 export const updatePost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const post = await Post.findById(req.params.id);
@@ -200,28 +97,7 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-/**
- * @swagger
- * /api/posts/{id}:
- *   delete:
- *     summary: Delete a post (owner only)
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Post deleted
- *       403:
- *         description: Not authorized
- *       404:
- *         description: Post not found
- */
+
 export const deletePost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const post = await Post.findById(req.params.id);
@@ -245,34 +121,7 @@ export const deletePost = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-/**
- * @swagger
- * /api/posts/user/{userId}:
- *   get:
- *     summary: Get posts by a specific user
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *     responses:
- *       200:
- *         description: List of user's posts
- */
+
 export const getPostsByUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
