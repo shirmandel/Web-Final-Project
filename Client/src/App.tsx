@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import FeedPage from "./pages/FeedPage";
 
 import { useAuth } from "./context/AuthContext";
+import EditPostPage from "./pages/EditPostPage";
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -33,6 +34,15 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditPostPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Box>
