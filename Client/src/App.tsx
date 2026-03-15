@@ -9,10 +9,10 @@ import RegisterPage from "./pages/RegisterPage";
 import { useAuth } from "./context/AuthContext";
 
 import EditPostPage from "./pages/EditPostPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
-
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.paper" }}>
@@ -40,6 +40,14 @@ const AppContent: React.FC = () => {
           element={
             <ProtectedRoute>
               <EditPostPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfilePage />
             </ProtectedRoute>
           }
         />
