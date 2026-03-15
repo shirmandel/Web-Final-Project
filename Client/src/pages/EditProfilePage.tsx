@@ -63,8 +63,10 @@ const EditProfilePage: React.FC = () => {
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setSuccess("Profile updated successfully!");
       setTimeout(() => navigate(`/profile/${user._id}`), 1000);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to update profile.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to update profile.";
+      setError(message);
     } finally {
       setLoading(false);
     }
