@@ -85,14 +85,12 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         containedPrimary: {
-          background:
-            "linear-gradient(135deg, #129990 0%, #096B68 100%)",
+          background: "linear-gradient(135deg, #129990 0%, #096B68 100%)",
           boxShadow: "0 4px 16px rgba(18, 153, 144, 0.35)",
           borderRadius: 10,
           color: "#FFFFFF",
           "&:hover": {
-            background:
-              "linear-gradient(135deg, #096B68 0%, #064845 100%)",
+            background: "linear-gradient(135deg, #096B68 0%, #064845 100%)",
             boxShadow: "0 6px 24px rgba(18, 153, 144, 0.45)",
           },
         },
