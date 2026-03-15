@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -11,19 +11,19 @@ import {
   Typography,
   Box,
   Chip,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
   ChatBubbleOutline as CommentIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-} from '@mui/icons-material';
-import { type Post } from '../services/post.service';
-import { likeService } from '../services/like.service';
-import { useAuth } from '../context/AuthContext';
+} from "@mui/icons-material";
+import { type Post } from "../services/post.service";
+import { likeService } from "../services/like.service";
+import { useAuth } from "../context/AuthContext";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 interface PostCardProps {
   post: Post;
@@ -41,7 +41,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
       try {
         const status = await likeService.getStatus(post._id);
         setLiked(status.liked);
-      } catch {   
+      } catch {
         throw new Error("error checking like status");
       }
     };
@@ -53,7 +53,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
       const result = await likeService.toggle(post._id);
       setLiked(result.liked);
       setLikesCount(result.likesCount);
-    } catch (err) {
+    } catch {
       throw new Error("error liking post");
     }
   };
@@ -62,19 +62,19 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
   const timeAgo = getTimeAgo(post.createdAt);
 
   const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http")) return imagePath;
     return `${API_URL}${imagePath}`;
   };
 
   return (
-    <Card sx={{ mb: 3, overflow: 'hidden' }}>
+    <Card sx={{ mb: 3, overflow: "hidden" }}>
       <CardHeader
         avatar={
           <Avatar
             src={getImageUrl(post.owner.profileImage)}
             onClick={() => navigate(`/profile/${post.owner._id}`)}
-            sx={{ cursor: 'pointer', bgcolor: 'primary.dark' }}
+            sx={{ cursor: "pointer", bgcolor: "primary.dark" }}
           >
             {post.owner.username?.charAt(0).toUpperCase()}
           </Avatar>
@@ -84,7 +84,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
             variant="subtitle1"
             fontWeight={600}
             onClick={() => navigate(`/profile/${post.owner._id}`)}
-            sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+            sx={{ cursor: "pointer", "&:hover": { color: "primary.main" } }}
           >
             {post.owner.username}
           </Typography>
@@ -97,10 +97,17 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
         action={
           isOwner ? (
             <Box>
-              <IconButton onClick={() => navigate(`/edit/${post._id}`)} size="small">
+              <IconButton
+                onClick={() => navigate(`/edit/${post._id}`)}
+                size="small"
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
-              <IconButton onClick={() => onDelete?.(post._id)} size="small" color="error">
+              <IconButton
+                onClick={() => onDelete?.(post._id)}
+                size="small"
+                color="error"
+              >
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Box>
@@ -115,7 +122,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
           alt={post.title}
           sx={{
             maxHeight: 500,
-            objectFit: 'cover',
+            objectFit: "cover",
           }}
         />
       )}
@@ -133,9 +140,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
         <IconButton
           onClick={handleLike}
           sx={{
-            color: liked ? '#FF1744' : 'text.secondary',
-            transition: 'all 0.2s ease',
-            '&:hover': { transform: 'scale(1.2)' },
+            color: liked ? "#FF1744" : "text.secondary",
+            transition: "all 0.2s ease",
+            "&:hover": { transform: "scale(1.2)" },
           }}
         >
           {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
@@ -146,7 +153,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
 
         <IconButton
           onClick={() => navigate(`/post/${post._id}`)}
-          sx={{ color: 'text.secondary' }}
+          sx={{ color: "text.secondary" }}
         >
           <CommentIcon />
         </IconButton>
@@ -154,7 +161,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
           label={post.commentsCount}
           size="small"
           variant="outlined"
-          sx={{ borderColor: 'rgba(255,255,255,0.1)' }}
+          sx={{ borderColor: "rgba(255,255,255,0.1)" }}
         />
       </CardActions>
     </Card>
@@ -166,7 +173,7 @@ function getTimeAgo(dateStr: string): string {
   const date = new Date(dateStr);
   const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diff < 60) return 'just now';
+  if (diff < 60) return "just now";
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
