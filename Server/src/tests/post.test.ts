@@ -85,7 +85,7 @@ describe("Post Routes", () => {
         });
 
         it("should get all posts with pagination", async () => {
-            const res = await request(app).get("/api/posts");
+            const res = await request(app).get("/api/posts").set("Authorization", `Bearer ${accessToken}`);
 
             expect(res.status).toBe(200);
             expect(res.body.posts.length).toBe(2);
@@ -106,7 +106,7 @@ describe("Post Routes", () => {
         });
 
         it("should get a single post by id", async () => {
-            const res = await request(app).get(`/api/posts/${postId}`);
+            const res = await request(app).get(`/api/posts/${postId}`).set("Authorization", `Bearer ${accessToken}`);
 
             expect(res.status).toBe(200);
             expect(res.body.title).toBe("Test Post");
@@ -114,7 +114,7 @@ describe("Post Routes", () => {
 
         it("should return 404 for non-existent post", async () => {
             const fakeId = new mongoose.Types.ObjectId();
-            const res = await request(app).get(`/api/posts/${fakeId}`);
+            const res = await request(app).get(`/api/posts/${fakeId}`).set("Authorization", `Bearer ${accessToken}`);
 
             expect(res.status).toBe(404);
         });
