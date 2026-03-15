@@ -1,15 +1,22 @@
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import FeedPage from "./pages/FeedPage";
+import { Box } from "@mui/material";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { useAuth } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
 
-function App() {
+import EditPostPage from "./pages/EditPostPage";
+
+const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
+
   return (
-    <BrowserRouter>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.paper" }}>
+      {isAuthenticated && <Navbar />}
       <Routes>
         <Route
           path="/login"
@@ -19,6 +26,7 @@ function App() {
           path="/register"
           element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />}
         />
+
         <Route
           path="/"
           element={
@@ -27,10 +35,27 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditPostPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+    </Box>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
-}
+};
 
 export default App;

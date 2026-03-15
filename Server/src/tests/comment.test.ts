@@ -98,7 +98,7 @@ describe("Comment Routes", () => {
         });
 
         it("should get all comments for a post", async () => {
-            const res = await request(app).get(`/api/comments/${postId}`);
+            const res = await request(app).get(`/api/comments/${postId}`).set("Authorization", `Bearer ${accessToken}`);
 
             expect(res.status).toBe(200);
             expect(res.body.length).toBe(2);

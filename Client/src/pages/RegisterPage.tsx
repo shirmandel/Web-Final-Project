@@ -141,15 +141,15 @@ const RegisterPage: React.FC = () => {
         <Typography
           variant="h4"
           textAlign="center"
-          sx={{
+          sx={(theme) => ({
             mb: 0.5,
-            background: "linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%)",
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 800,
             fontSize: { xs: "1.75rem", sm: "2.125rem" },
             letterSpacing: "-0.02em",
-          }}
+          })}
         >
           Sign Up
         </Typography>
@@ -289,7 +289,7 @@ const RegisterPage: React.FC = () => {
             component="span"
             onClick={() => navigate("/login")}
             sx={{
-              color: "#7C3AED",
+              color: "primary.main",
               cursor: "pointer",
               fontWeight: 600,
               "&:hover": {

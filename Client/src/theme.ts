@@ -1,29 +1,43 @@
 import { createTheme } from "@mui/material/styles";
 
+// Palette
+// #FFFBDE – warm cream     → page background
+// #90D1CA – soft teal      → primary light
+// #129990 – medium teal    → primary main
+// #096B68 – deep teal      → primary dark
+
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#7C3AED",
-      light: "#A78BFA",
-      dark: "#5B21B6",
+      main: "#129990",
+      light: "#90D1CA",
+      dark: "#096B68",
+      contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "#06B6D4",
-      light: "#22D3EE",
-      dark: "#0891B2",
+      main: "#096B68",
+      light: "#129990",
+      dark: "#064845",
+      contrastText: "#FFFFFF",
+    },
+    warning: {
+      main: "#90D1CA",
+      light: "#B8E5E1",
+      dark: "#129990",
+    },
+    error: {
+      main: "#D32F2F",
     },
     background: {
-      default: "#F8FAFC",
+      default: "#FFFBDE",
       paper: "#FFFFFF",
     },
     text: {
-      primary: "#1E293B",
-      secondary: "#64748B",
+      primary: "#0D3533",
+      secondary: "#3A6B68",
     },
-    error: {
-      main: "#EF4444",
-    },
+    divider: "#C8E8E5",
   },
   typography: {
     fontFamily:
@@ -47,23 +61,23 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           "& .MuiOutlinedInput-root": {
-            backgroundColor: "#F8FAFC",
+            backgroundColor: "#FFFFFF",
             borderRadius: 10,
             "& fieldset": {
-              borderColor: "#E2E8F0",
+              borderColor: "#90D1CA",
             },
             "&:hover fieldset": {
-              borderColor: "#A78BFA",
+              borderColor: "#129990",
             },
             "&.Mui-focused fieldset": {
-              borderColor: "#7C3AED",
+              borderColor: "#096B68",
             },
           },
           "& .MuiInputLabel-root": {
-            color: "#94A3B8",
+            color: "#3A6B68",
           },
           "& .MuiInputLabel-root.Mui-focused": {
-            color: "#7C3AED",
+            color: "#096B68",
           },
         },
       },
@@ -72,15 +86,42 @@ const theme = createTheme({
       styleOverrides: {
         containedPrimary: {
           background:
-            "linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #06B6D4 100%)",
-          boxShadow: "0 4px 20px rgba(124, 58, 237, 0.3)",
+            "linear-gradient(135deg, #129990 0%, #096B68 100%)",
+          boxShadow: "0 4px 16px rgba(18, 153, 144, 0.35)",
           borderRadius: 10,
           color: "#FFFFFF",
           "&:hover": {
             background:
-              "linear-gradient(135deg, #6D28D9 0%, #9333EA 50%, #0891B2 100%)",
-            boxShadow: "0 6px 28px rgba(124, 58, 237, 0.45)",
+              "linear-gradient(135deg, #096B68 0%, #064845 100%)",
+            boxShadow: "0 6px 24px rgba(18, 153, 144, 0.45)",
           },
+        },
+        containedSecondary: {
+          background: "#096B68",
+          boxShadow: "0 4px 16px rgba(9, 107, 104, 0.35)",
+          borderRadius: 10,
+          color: "#FFFFFF",
+          "&:hover": {
+            background: "#064845",
+            boxShadow: "0 6px 24px rgba(9, 107, 104, 0.45)",
+          },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: "linear-gradient(135deg, #129990 0%, #096B68 100%)",
+          color: "#FFFFFF",
+          boxShadow: "0 2px 12px rgba(18, 153, 144, 0.3)",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#FFFFFF",
+          border: "1px solid #C8E8E5",
         },
       },
     },
@@ -94,8 +135,8 @@ const theme = createTheme({
     MuiAlert: {
       styleOverrides: {
         standardError: {
-          backgroundColor: "#FEF2F2",
-          color: "#DC2626",
+          backgroundColor: "#FFE8E8",
+          color: "#D32F2F",
           borderRadius: 10,
         },
       },
@@ -103,7 +144,14 @@ const theme = createTheme({
     MuiDivider: {
       styleOverrides: {
         root: {
-          borderColor: "#E2E8F0",
+          borderColor: "#C8E8E5",
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderColor: "#90D1CA",
         },
       },
     },
