@@ -7,28 +7,19 @@ import {
   Paper,
   Alert,
   Divider,
-  InputAdornment,
-  IconButton,
   CircularProgress,
 } from "@mui/material";
-import {
-  Visibility,
-  VisibilityOff,
-  Email as EmailIcon,
-  Lock as LockIcon,
-  Person as PersonIcon,
-} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +27,7 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!email || !username || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
@@ -59,7 +50,8 @@ const RegisterPage: React.FC = () => {
 
     setLoading(true);
     try {
-      console.log("Register submitted:", { name, email, password });
+      await register(email, username, password);
+      navigate("/");
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -159,7 +151,7 @@ const RegisterPage: React.FC = () => {
             letterSpacing: "-0.02em",
           })}
         >
-          InstaVibe
+          Sign Up
         </Typography>
 
         <Typography
@@ -184,27 +176,6 @@ const RegisterPage: React.FC = () => {
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
-            label="Full Name"
-            type="text"
-            fullWidth
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            margin="normal"
-            required
-            id="register-name"
-            autoComplete="name"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <TextField
             label="Email"
             type="email"
             fullWidth
@@ -213,90 +184,37 @@ const RegisterPage: React.FC = () => {
             margin="normal"
             required
             id="register-email"
-            autoComplete="email"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
           />
-
+          <TextField
+            label="Username"
+            fullWidth
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            margin="normal"
+            required
+            id="register-username"
+          />
           <TextField
             label="Password"
-            type={showPassword ? "text" : "password"}
+            type="password"
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             margin="normal"
             required
+            helperText="At least 6 characters"
             id="register-password"
-            autoComplete="new-password"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                      size="small"
-                      sx={{ color: "#94A3B8" }}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
           />
 
           <TextField
             label="Confirm Password"
-            type={showConfirm ? "text" : "password"}
+            type="password"
             fullWidth
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             margin="normal"
             required
             id="register-confirm-password"
-            autoComplete="new-password"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowConfirm(!showConfirm)}
-                      edge="end"
-                      size="small"
-                      sx={{ color: "#94A3B8" }}
-                      aria-label={
-                        showConfirm
-                          ? "Hide confirm password"
-                          : "Show confirm password"
-                      }
-                    >
-                      {showConfirm ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
           />
 
           <Button

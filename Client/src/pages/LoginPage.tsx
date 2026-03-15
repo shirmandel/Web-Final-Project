@@ -8,26 +8,19 @@ import {
   Paper,
   Alert,
   Divider,
-  InputAdornment,
-  IconButton,
   CircularProgress,
 } from "@mui/material";
-import {
-  Visibility,
-  VisibilityOff,
-  Email as EmailIcon,
-  Lock as LockIcon,
-} from "@mui/icons-material";
+
 import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [error, setError] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +138,7 @@ const LoginPage: React.FC = () => {
             letterSpacing: "-0.02em",
           })}
         >
-          InstaVibe
+          Sign In
         </Typography>
 
         <Typography
@@ -178,52 +171,16 @@ const LoginPage: React.FC = () => {
             margin="normal"
             required
             id="login-email"
-            autoComplete="email"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
           />
-
           <TextField
             label="Password"
-            type={showPassword ? "text" : "password"}
+            type="password"
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             margin="normal"
             required
             id="login-password"
-            autoComplete="current-password"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon sx={{ color: "#94A3B8", fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                      size="small"
-                      sx={{ color: "#94A3B8" }}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
           />
 
           <Button
