@@ -110,7 +110,7 @@ const PostDetailPage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
+    <Container maxWidth="lg" sx={{ py: 3 }}>
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate(-1)}
@@ -119,81 +119,91 @@ const PostDetailPage: React.FC = () => {
         Back
       </Button>
 
-      <PostCard post={post} />
+      <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+        {/* Post */}
+        <Box sx={{ flex: "0 0 auto", width: { xs: "100%", md: "50%" } }}>
+          <PostCard post={post} />
+        </Box>
 
-      <Typography variant="h6" fontWeight={600} sx={{ mt: 3, mb: 2 }}>
-        Comments ({comments.length})
-      </Typography>
+        {/* Comment Section */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+            Comments ({comments.length})
+          </Typography>
 
-      <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Write a comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-          id="comment-input"
-        />
-        <Button
-          variant="contained"
-          onClick={handleAddComment}
-          disabled={submitting || !newComment.trim()}
-          id="comment-submit"
-        >
-          Post
-        </Button>
-      </Box>
+          <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Write a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
+              id="comment-input"
+            />
+            <Button
+              variant="contained"
+              onClick={handleAddComment}
+              disabled={submitting || !newComment.trim()}
+              id="comment-submit"
+            >
+              Post
+            </Button>
+          </Box>
 
-      <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ mb: 2 }} />
 
-      {comments.map((comment) => (
-        <Card
-          key={comment._id}
-          sx={{ mb: 1.5, background: "background.default" }}
-        >
-          <CardHeader
-            avatar={
-              <Avatar
-                src={getImageUrl(comment.owner.profileImage)}
-                sx={{ width: 32, height: 32 }}
+          <Box sx={{ maxHeight: "70vh", overflowY: "auto" }}>
+            {comments.map((comment) => (
+              <Card
+                key={comment._id}
+                sx={{ mb: 1.5, background: "background.default" }}
               >
-                {comment.owner.username?.charAt(0).toUpperCase()}
-              </Avatar>
-            }
-            title={
-              <Typography variant="subtitle2" fontWeight={600}>
-                {comment.owner.username}
-              </Typography>
-            }
-            subheader={
-              <Typography variant="caption" color="text.secondary">
-                {new Date(comment.createdAt).toLocaleDateString()}
-              </Typography>
-            }
-            action={
-              user?._id === comment.owner._id ? (
-                <IconButton
-                  size="small"
-                  onClick={() => handleDeleteComment(comment._id)}
-                  color="error"
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              ) : null
-            }
-          />
-          <CardContent sx={{ pt: 0 }}>
-            <Typography variant="body2">{comment.content}</Typography>
-          </CardContent>
-        </Card>
-      ))}
+                <CardHeader
+                  avatar={
+                    <Avatar
+                      src={getImageUrl(comment.owner.profileImage)}
+                      sx={{ width: 32, height: 32 }}
+                    >
+                      {comment.owner.username?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  }
+                  title={
+                    <Typography variant="subtitle2" fontWeight={600}>
+                      {comment.owner.username}
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </Typography>
+                  }
+                  action={
+                    user?._id === comment.owner._id ? (
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteComment(comment._id)}
+                        color="error"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    ) : null
+                  }
+                />
+                <CardContent sx={{ pt: 0 }}>
+                  <Typography variant="body2">{comment.content}</Typography>
+                </CardContent>
+              </Card>
+            ))}
 
-      {comments.length === 0 && (
-        <Typography color="text.secondary" textAlign="center" mt={2}>
-          No comments yet. Be the first! 💬
-        </Typography>
-      )}
+            {comments.length === 0 && (
+              <Typography color="text.secondary" textAlign="center" mt={2}>
+                No comments yet. Be the first! 💬
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      </Box>
     </Container>
   );
 };
