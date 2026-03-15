@@ -30,10 +30,10 @@ const userSchema = new Schema<IUser>(
       type: String,
       default: "",
     },
-    // googleId: {
-    //   type: String,
-    //   sparse: true,
-    // },
+    googleId: {
+      type: String,
+      sparse: true,
+    },
     refreshTokens: {
       type: [String],
       default: [],
