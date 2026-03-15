@@ -32,7 +32,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved user on mount
     const savedUser = authService.getUser();
     if (savedUser && authService.isAuthenticated()) {
       setUser(savedUser);
