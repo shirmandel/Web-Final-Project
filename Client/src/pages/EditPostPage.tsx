@@ -99,7 +99,7 @@ const EditPostPage: React.FC = () => {
       <Paper
         sx={{
           p: 3,
-          background: "rgba(218, 218, 237, 0.8)",
+          background: "background.paper",
           backdropFilter: "blur(20px)",
         }}
       >

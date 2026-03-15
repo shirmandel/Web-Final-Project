@@ -51,14 +51,14 @@ const Navbar: React.FC = () => {
         <Typography
           variant="h5"
           onClick={() => navigate("/")}
-          sx={{
+          sx={(theme) => ({
             cursor: "pointer",
-            background: "linear-gradient(135deg, #E040FB, #00E5FF)",
+            background: `${theme.palette.primary.contrastText}`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 800,
             letterSpacing: -0.5,
-          }}
+          })}
         >
           InstaVibe
         </Typography>
@@ -67,7 +67,9 @@ const Navbar: React.FC = () => {
           <Tooltip title="Home">
             <IconButton
               onClick={() => navigate("/")}
-              sx={{ color: isActive("/") ? "primary.main" : "text.secondary" }}
+              sx={{
+                color: isActive("/") ? "primary.main" : "primary.contrastText",
+              }}
             >
               <HomeIcon />
             </IconButton>
@@ -77,7 +79,9 @@ const Navbar: React.FC = () => {
             <IconButton
               onClick={() => navigate("/search")}
               sx={{
-                color: isActive("/search") ? "primary.main" : "text.secondary",
+                color: isActive("/search")
+                  ? "primary.main"
+                  : "primary.contrastText",
               }}
             >
               <SearchIcon />
@@ -88,7 +92,9 @@ const Navbar: React.FC = () => {
             <IconButton
               onClick={() => navigate("/create")}
               sx={{
-                color: isActive("/create") ? "primary.main" : "text.secondary",
+                color: isActive("/create")
+                  ? "primary.main"
+                  : "primary.contrastText",
               }}
             >
               <AddIcon />
@@ -101,7 +107,7 @@ const Navbar: React.FC = () => {
               sx={{
                 color: isActive("/my-posts")
                   ? "primary.main"
-                  : "text.secondary",
+                  : "primary.contrastText",
               }}
             >
               <PersonIcon />
@@ -125,7 +131,10 @@ const Navbar: React.FC = () => {
           </Tooltip>
 
           <Tooltip title="Logout">
-            <IconButton onClick={handleLogout} sx={{ color: "text.secondary" }}>
+            <IconButton
+              onClick={handleLogout}
+              sx={{ color: "primary.contrastText" }}
+            >
               <LogoutIcon />
             </IconButton>
           </Tooltip>

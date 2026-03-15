@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, CircularProgress, Typography, Container } from '@mui/material';
-import { postService, type Post } from '../services/post.service';
-import PostCard from '../components/PostCard';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Box, CircularProgress, Typography, Container } from "@mui/material";
+import { postService, type Post } from "../services/post.service";
+import PostCard from "../components/PostCard";
 
 const FeedPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -10,19 +10,24 @@ const FeedPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const loadPosts = useCallback(async (pageNum: number) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const data = await postService.getAll(pageNum, 10);
-      setPosts((prev) => (pageNum === 1 ? data.posts : [...prev, ...data.posts]));
-      setHasMore(pageNum < data.totalPages);
-    } catch (err) {
-      console.error('Failed to load posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [loading]);
+  const loadPosts = useCallback(
+    async (pageNum: number) => {
+      if (loading) return;
+      setLoading(true);
+      try {
+        const data = await postService.getAll(pageNum, 10);
+        setPosts((prev) =>
+          pageNum === 1 ? data.posts : [...prev, ...data.posts],
+        );
+        setHasMore(pageNum < data.totalPages);
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading],
+  );
 
   useEffect(() => {
     loadPosts(1);
@@ -45,16 +50,16 @@ const FeedPage: React.FC = () => {
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, loadPosts]
+    [loading, hasMore, loadPosts],
   );
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
       await postService.delete(id);
       setPosts((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
-      console.error('Failed to delete post:', err);
+      console.error("Failed to delete post:", err);
     }
   };
 
@@ -63,12 +68,12 @@ const FeedPage: React.FC = () => {
       <Typography
         variant="h5"
         fontWeight={700}
-        sx={{
+        sx={(theme) => ({
           mb: 3,
-          background: 'linear-gradient(135deg, #E040FB, #00E5FF)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}
+          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        })}
       >
         Feed
       </Typography>

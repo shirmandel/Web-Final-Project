@@ -14,7 +14,7 @@ const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.paper" }}>
       {isAuthenticated && <Navbar />}
       <Routes>
         <Route

@@ -140,7 +140,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
         <IconButton
           onClick={handleLike}
           sx={{
-            color: liked ? "#FF1744" : "text.secondary",
+            color: liked ? "primary.dark" : "text.secondary",
             transition: "all 0.2s ease",
             "&:hover": { transform: "scale(1.2)" },
           }}
