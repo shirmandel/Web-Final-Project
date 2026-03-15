@@ -72,14 +72,23 @@ const EditProfilePage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Typography variant="h5" fontWeight={700} mb={3}>
+      <Typography
+        variant="h5"
+        fontWeight={700}
+        sx={(theme) => ({
+          mb: 3,
+          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        })}
+      >
         Edit Profile
       </Typography>
 
       <Paper
         sx={{
           p: 3,
-          background: "rgba(18, 18, 26, 0.8)",
+          background: "rgba(255, 255, 255, 0.8)",
           backdropFilter: "blur(20px)",
           border: "1px solid rgba(255, 255, 255, 0.06)",
         }}

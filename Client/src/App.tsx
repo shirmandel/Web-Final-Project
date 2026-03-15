@@ -1,5 +1,5 @@
+import "./App.css";
 import React from "react";
-import { Box } from "@mui/material";
 import FeedPage from "./pages/FeedPage";
 import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
@@ -15,9 +15,11 @@ const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.paper" }}>
-      {isAuthenticated && <Navbar />}
-      <Routes>
+    <div className="app-background">
+      <div className="app-blob" />
+      <div className="app-content">
+        {isAuthenticated && <Navbar />}
+        <Routes>
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />}
@@ -61,8 +63,9 @@ const AppContent: React.FC = () => {
         />
 
         <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </Box>
+        </Routes>
+      </div>
+    </div>
   );
 };
 
