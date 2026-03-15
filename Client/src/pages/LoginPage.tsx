@@ -10,11 +10,12 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 
 import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -50,7 +51,16 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = () => {};
+  const handleGoogleLogin = async (response: CredentialResponse) => {
+    if (response.credential) {
+      try {
+        await googleLogin(response.credential);
+        navigate("/");
+      } catch {
+        setError("Google login failed.");
+      }
+    }
+  };
 
   return (
     <Box
@@ -216,33 +226,17 @@ const LoginPage: React.FC = () => {
           </Typography>
         </Divider>
 
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={handleGoogleLogin}
-          sx={{
-            py: 1.3,
-            mb: 3,
-            borderColor: "#E2E8F0",
-            color: "text.primary",
-            borderRadius: "10px",
-            fontSize: "0.9rem",
-            backgroundColor: "#FFFFFF",
-            "&:hover": {
-              borderColor: "#A78BFA",
-              backgroundColor: "#FAFAFF",
-            },
-          }}
-          id="login-google"
-        >
-          <Box
-            component="img"
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            alt="Google"
-            sx={{ width: 20, height: 20, mr: 1.5 }}
+        <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }} id="login-google">
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => setError("Google login failed.")}
+            width="360"
+            theme="outline"
+            shape="rectangular"
+            text="continue_with"
+            logo_alignment="left"
           />
-          Continue with Google
-        </Button>
+        </Box>
 
         <Typography
           variant="body2"
