@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import PostCard from "../components/PostCard";
 import { useAuth } from "../context/AuthContext";
+import type { User } from "../services/auth.service";
 import { Edit as EditIcon } from "@mui/icons-material";
 import { userService } from "../services/user.service";
 import { postService, type Post } from "../services/post.service";
@@ -19,10 +20,10 @@ import { postService, type Post } from "../services/post.service";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const ProfilePage: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
