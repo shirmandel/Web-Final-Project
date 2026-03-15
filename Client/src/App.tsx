@@ -7,9 +7,9 @@ import ProfilePage from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import { useAuth } from "./context/AuthContext";
 import EditPostPage from "./pages/EditPostPage";
+import EditProfilePage from "./pages/EditProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import EditProfilePage from "./pages/EditProfilePage";
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
