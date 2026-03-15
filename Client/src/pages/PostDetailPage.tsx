@@ -120,12 +120,10 @@ const PostDetailPage: React.FC = () => {
       </Button>
 
       <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
-        {/* Post */}
         <Box sx={{ flex: "0 0 auto", width: { xs: "100%", md: "50%" } }}>
           <PostCard post={post} />
         </Box>
 
-        {/* Comment Section */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
             Comments ({comments.length})
