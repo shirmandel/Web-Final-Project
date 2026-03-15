@@ -10,6 +10,8 @@ import EditPostPage from "./pages/EditPostPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import CreatePostPage from "./pages/CreatePostPage";
+import PostDetailPage from "./pages/PostDetailPage";
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -58,6 +60,22 @@ const AppContent: React.FC = () => {
           element={
             <ProtectedRoute>
               <EditProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <CreatePostPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/post/:id"
+          element={
+            <ProtectedRoute>
+              <PostDetailPage />
             </ProtectedRoute>
           }
         />
