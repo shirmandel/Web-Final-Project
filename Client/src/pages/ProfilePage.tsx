@@ -87,7 +87,7 @@ const ProfilePage: React.FC = () => {
           p: 4,
           mb: 3,
           textAlign: "center",
-          background: "rgba(243, 243, 249, 0.8)",
+          background: "rgba(255, 255, 255, 0.8)",
           backdropFilter: "blur(20px)",
           border: "1px solid rgba(255, 255, 255, 0.06)",
         }}

@@ -72,56 +72,9 @@ const RegisterPage: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background:
-          "linear-gradient(135deg, #EDE9FE 0%, #F0F9FF 30%, #ECFDF5 60%, #FDF4FF 100%)",
-        position: "relative",
-        overflow: "hidden",
         p: 2,
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          top: "-15%",
-          left: "-8%",
-          width: 450,
-          height: 450,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)",
-          filter: "blur(50px)",
-          pointerEvents: "none",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "-12%",
-          right: "-5%",
-          width: 380,
-          height: 380,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)",
-          filter: "blur(50px)",
-          pointerEvents: "none",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "40%",
-          right: "15%",
-          width: 250,
-          height: 250,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(244,114,182,0.08) 0%, transparent 70%)",
-          filter: "blur(40px)",
-          pointerEvents: "none",
-        }}
-      />
-
       <Paper
         elevation={0}
         sx={{

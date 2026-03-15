@@ -196,7 +196,7 @@ const PostDetailPage: React.FC = () => {
 
             {comments.length === 0 && (
               <Typography color="text.secondary" textAlign="center" mt={2}>
-                No comments yet. Be the first! 💬
+                No comments yet. Be the first!
               </Typography>
             )}
           </Box>
