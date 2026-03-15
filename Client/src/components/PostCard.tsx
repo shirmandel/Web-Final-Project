@@ -41,7 +41,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
       try {
         const status = await likeService.getStatus(post._id);
         setLiked(status.liked);
-      } catch (err) {
+      } catch {   
         throw new Error("error checking like status");
       }
     };
