@@ -34,7 +34,11 @@ export const authService = {
     return data;
   },
 
-//   async googleLogin() {},
+  async googleLogin(credential: string): Promise<AuthResponse> {
+    const { data } = await api.post("/api/auth/google", { credential });
+    this.saveTokens(data);
+    return data;
+  },
 
   async logout(): Promise<void> {
     try {
