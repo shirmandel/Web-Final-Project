@@ -2,7 +2,9 @@ import { Response } from 'express';
 import Post from '../models/post.model';
 import Comment from '../models/comment.model';
 import Like from '../models/like.model';
+import User from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { parseSearchQuery } from '../services/ai.service';
 
 
 export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -157,5 +159,86 @@ export const getPostsByUser = async (req: AuthRequest, res: Response): Promise<v
     });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
+  }
+};
+
+
+export const searchPosts = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { query } = req.body;
+
+    if (!query || typeof query !== 'string' || !query.trim()) {
+      res.status(400).json({ error: 'Search query is required.' });
+      return;
+    }
+
+    const parsed = await parseSearchQuery(query);
+
+    // Build a safe MongoDB filter from the parsed AI response
+    const filter: Record<string, unknown> = {};
+
+    if (parsed.textSearch) {
+      // Escape regex special characters to prevent ReDoS
+      const escaped = parsed.textSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.text = { $regex: escaped, $options: 'i' };
+    }
+
+    if (parsed.dateFrom || parsed.dateTo) {
+      const dateFilter: Record<string, Date> = {};
+      if (parsed.dateFrom) {
+        const from = new Date(parsed.dateFrom);
+        if (!isNaN(from.getTime())) dateFilter.$gte = from;
+      }
+      if (parsed.dateTo) {
+        const to = new Date(parsed.dateTo);
+        if (!isNaN(to.getTime())) dateFilter.$lte = to;
+      }
+      if (Object.keys(dateFilter).length > 0) {
+        filter.createdAt = dateFilter;
+      }
+    }
+
+    if (parsed.username) {
+      const escaped = parsed.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const matchingUser = await User.findOne({
+        username: { $regex: `^${escaped}$`, $options: 'i' },
+      });
+      if (matchingUser) {
+        filter.owner = matchingUser._id;
+      } else {
+        res.status(200).json({
+          posts: [],
+          currentPage: 1,
+          totalPages: 0,
+          totalPosts: 0,
+          parsedQuery: parsed,
+        });
+        return;
+      }
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find(filter)
+      .populate('owner', 'username profileImage')
+      .populate('likesCount')
+      .populate('commentsCount')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Post.countDocuments(filter);
+
+    res.status(200).json({
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalPosts: total,
+      parsedQuery: parsed,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Search failed. Please try again.' });
   }
 };
