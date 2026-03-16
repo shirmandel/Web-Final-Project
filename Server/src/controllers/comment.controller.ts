@@ -40,9 +40,6 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<vo
 
     const savedComment = await comment.save();
 
-    post.commentsCount += 1;
-    await post.save();
-
     const populatedComment = await savedComment.populate('owner', 'username profileImage');
 
     res.status(201).json(populatedComment);
@@ -65,11 +62,6 @@ export const deleteComment = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    const post = await Post.findById(comment.postId);
-    if (post) {
-      post.commentsCount = Math.max(0, post.commentsCount - 1);
-      await post.save();
-    }
 
     await comment.deleteOne();
 

@@ -2,8 +2,7 @@ import api from "./api";
 
 export interface Post {
   _id: string;
-  title: string;
-  content: string;
+  text: string;
   image?: string;
   owner: {
     _id: string;

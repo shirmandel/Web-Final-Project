@@ -13,6 +13,8 @@ export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void
 
     const posts = await Post.find()
       .populate('owner', 'username profileImage')
+      .populate('likesCount')
+      .populate('commentsCount')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -33,7 +35,10 @@ export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void
 
 export const getPostById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const post = await Post.findById(req.params.id).populate('owner', 'username profileImage');
+    const post = await Post.findById(req.params.id)
+      .populate('owner', 'username profileImage')
+      .populate('likesCount')
+      .populate('commentsCount');
     if (!post) {
       res.status(404).json({ error: 'Post not found.' });
       return;
@@ -47,22 +52,25 @@ export const getPostById = async (req: AuthRequest, res: Response): Promise<void
 
 export const createPost = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { title, content } = req.body;
+    const { text } = req.body;
 
-    if (!title || !content) {
-      res.status(400).json({ error: 'Title and content are required.' });
+    if (!text) {
+      res.status(400).json({ error: 'Text content is required.' });
       return;
     }
 
     const post = new Post({
-      title,
-      content,
+      text,
       image: req.file ? `/uploads/${req.file.filename}` : '',
       owner: req.userId,
     });
 
     const savedPost = await post.save();
-    const populatedPost = await savedPost.populate('owner', 'username profileImage');
+    const populatedPost = await savedPost
+      .populate('owner', 'username profileImage');
+
+    await populatedPost.populate('likesCount');
+    await populatedPost.populate('commentsCount');
 
     res.status(201).json(populatedPost);
   } catch (err) {
@@ -84,12 +92,15 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    if (req.body.title) post.title = req.body.title;
-    if (req.body.content) post.content = req.body.content;
+    if (req.body.text) post.text = req.body.text;
     if (req.file) post.image = `/uploads/${req.file.filename}`;
 
     const updatedPost = await post.save();
-    const populatedPost = await updatedPost.populate('owner', 'username profileImage');
+    const populatedPost = await updatedPost
+      .populate('owner', 'username profileImage');
+
+    await populatedPost.populate('likesCount');
+    await populatedPost.populate('commentsCount');
 
     res.status(200).json(populatedPost);
   } catch (err) {
@@ -130,6 +141,8 @@ export const getPostsByUser = async (req: AuthRequest, res: Response): Promise<v
 
     const posts = await Post.find({ owner: req.params.userId })
       .populate('owner', 'username profileImage')
+      .populate('likesCount')
+      .populate('commentsCount')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

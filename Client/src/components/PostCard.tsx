@@ -128,11 +128,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
       )}
 
       <CardContent>
-        <Typography variant="h6" gutterBottom>
-          {post.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {post.content}
+        <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+          {post.text}
         </Typography>
       </CardContent>
 

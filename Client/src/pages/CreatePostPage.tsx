@@ -13,8 +13,7 @@ import { CloudUpload as UploadIcon } from "@mui/icons-material";
 import { postService } from "../services/post.service";
 
 const CreatePostPage: React.FC = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -33,16 +32,15 @@ const CreatePostPage: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    if (!title.trim() || !content.trim()) {
-      setError("Title and content are required.");
+    if (!text.trim()) {
+      setError("Post text is required.");
       return;
     }
 
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
+      formData.append("text", text);
       if (image) formData.append("image", image);
 
       await postService.create(formData);
@@ -75,24 +73,15 @@ const CreatePostPage: React.FC = () => {
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
-            label="Title"
-            fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            margin="normal"
-            required
-            id="post-title"
-          />
-          <TextField
             label="What's on your mind?"
             fullWidth
             multiline
             rows={4}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
             margin="normal"
             required
-            id="post-content"
+            id="post-text"
           />
 
           <Button
