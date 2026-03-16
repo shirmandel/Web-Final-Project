@@ -18,8 +18,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const EditPostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [text, setText] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -31,8 +30,7 @@ const EditPostPage: React.FC = () => {
       if (!id) return;
       try {
         const post = await postService.getById(id);
-        setTitle(post.title);
-        setContent(post.content);
+        setText(post.text);
         if (post.image) {
           const url = post.image.startsWith("http")
             ? post.image
@@ -61,16 +59,15 @@ const EditPostPage: React.FC = () => {
     if (!id) return;
     setError("");
 
-    if (!title.trim() || !content.trim()) {
-      setError("Title and content are required.");
+    if (!text.trim()) {
+      setError("Text content is required.");
       return;
     }
 
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
+      formData.append("text", text);
       if (image) formData.append("image", image);
 
       await postService.update(id, formData);
@@ -111,20 +108,12 @@ const EditPostPage: React.FC = () => {
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
-            label="Title"
-            fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Content"
+            label="Post Text"
             fullWidth
             multiline
             rows={4}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
             margin="normal"
             required
           />

@@ -18,15 +18,13 @@ export const toggleLike = async (req: AuthRequest, res: Response): Promise<void>
 
     if (existingLike) {
       await existingLike.deleteOne();
-      post.likesCount = Math.max(0, post.likesCount - 1);
-      await post.save();
-      res.status(200).json({ liked: false, likesCount: post.likesCount });
+      const count = await Like.countDocuments({ postId });
+      res.status(200).json({ liked: false, likesCount: count });
     } else {
       const like = new Like({ postId, userId: req.userId });
       await like.save();
-      post.likesCount += 1;
-      await post.save();
-      res.status(200).json({ liked: true, likesCount: post.likesCount });
+      const count = await Like.countDocuments({ postId });
+      res.status(200).json({ liked: true, likesCount: count });
     }
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });

@@ -38,8 +38,7 @@ beforeEach(async () => {
     userId = res.body.user._id;
 
     const post = await Post.create({
-        title: "Test Post for Likes",
-        content: "Content",
+        text: "Content",
         owner: userId,
     });
     postId = post._id.toString();
@@ -56,7 +55,7 @@ describe("Like Routes", () => {
             expect(res.body.liked).toBe(true);
             expect(res.body.likesCount).toBe(1);
 
-            const post = await Post.findById(postId);
+            const post = await Post.findById(postId).populate('likesCount');
             expect(post?.likesCount).toBe(1);
         });
 
@@ -73,7 +72,7 @@ describe("Like Routes", () => {
             expect(res.body.liked).toBe(false);
             expect(res.body.likesCount).toBe(0);
 
-            const post = await Post.findById(postId);
+            const post = await Post.findById(postId).populate('likesCount');
             expect(post?.likesCount).toBe(0);
         });
 

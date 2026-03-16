@@ -1,8 +1,7 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IPost extends Document {
-  title: string;
-  content: string;
+  text: string;
   image?: string;
   owner: Types.ObjectId;
   likesCount: number;
@@ -11,12 +10,7 @@ export interface IPost extends Document {
 
 const postSchema = new Schema<IPost>(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    content: {
+    text: {
       type: String,
       required: true,
     },
@@ -29,18 +23,26 @@ const postSchema = new Schema<IPost>(
       ref: 'User',
       required: true,
     },
-    likesCount: {
-      type: Number,
-      default: 0,
-    },
-    commentsCount: {
-      type: Number,
-      default: 0,
-    },
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
+
+postSchema.virtual('likesCount', {
+  ref: 'Like',
+  localField: '_id',
+  foreignField: 'postId',
+  count: true
+});
+
+postSchema.virtual('commentsCount', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'postId',
+  count: true
+});
 
 export default mongoose.model<IPost>('Post', postSchema);

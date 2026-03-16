@@ -41,20 +41,17 @@ describe("Post Routes", () => {
             const res = await request(app)
                 .post("/api/posts")
                 .set("Authorization", `Bearer ${accessToken}`)
-                .field("title", "Test Post")
-                .field("content", "This is a test post.");
+                .field("text", "This is a test post.");
 
             expect(res.status).toBe(201);
-            expect(res.body.title).toBe("Test Post");
-            expect(res.body.content).toBe("This is a test post.");
+            expect(res.body.text).toBe("This is a test post.");
             expect(res.body.owner._id).toBe(userId);
         });
 
         it("should fail to create a post without authentication", async () => {
             const res = await request(app)
                 .post("/api/posts")
-                .field("title", "Test Post")
-                .field("content", "This is a test post.");
+                .field("text", "This is a test post.");
 
             expect(res.status).toBe(401);
         });
@@ -63,23 +60,21 @@ describe("Post Routes", () => {
             const res = await request(app)
                 .post("/api/posts")
                 .set("Authorization", `Bearer ${accessToken}`)
-                .field("title", "Test Post");
+                .field("text", "");
 
             expect(res.status).toBe(400);
-            expect(res.body.error).toBe("Title and content are required.");
+            expect(res.body.error).toBe("Text content is required.");
         });
     });
 
     describe("GET /api/posts", () => {
         beforeEach(async () => {
             await Post.create({
-                title: "Post 1",
-                content: "Content 1",
+                text: "Content 1",
                 owner: userId,
             });
             await Post.create({
-                title: "Post 2",
-                content: "Content 2",
+                text: "Content 2",
                 owner: userId,
             });
         });
@@ -98,8 +93,7 @@ describe("Post Routes", () => {
 
         beforeEach(async () => {
             const post = await Post.create({
-                title: "Test Post",
-                content: "Test Content",
+                text: "Test Content",
                 owner: userId,
             });
             postId = post._id.toString();
@@ -109,7 +103,7 @@ describe("Post Routes", () => {
             const res = await request(app).get(`/api/posts/${postId}`).set("Authorization", `Bearer ${accessToken}`);
 
             expect(res.status).toBe(200);
-            expect(res.body.title).toBe("Test Post");
+            expect(res.body.text).toBe("Test Content");
         });
 
         it("should return 404 for non-existent post", async () => {
@@ -125,8 +119,7 @@ describe("Post Routes", () => {
 
         beforeEach(async () => {
             const post = await Post.create({
-                title: "Original Title",
-                content: "Original Content",
+                text: "Original Content",
                 owner: userId,
             });
             postId = post._id.toString();
@@ -136,12 +129,10 @@ describe("Post Routes", () => {
             const res = await request(app)
                 .put(`/api/posts/${postId}`)
                 .set("Authorization", `Bearer ${accessToken}`)
-                .field("title", "Updated Title")
-                .field("content", "Updated Content");
+                .field("text", "Updated Content");
 
             expect(res.status).toBe(200);
-            expect(res.body.title).toBe("Updated Title");
-            expect(res.body.content).toBe("Updated Content");
+            expect(res.body.text).toBe("Updated Content");
         });
 
         it("should fail to update a post owned by someone else", async () => {
@@ -156,8 +147,7 @@ describe("Post Routes", () => {
             const res = await request(app)
                 .put(`/api/posts/${postId}`)
                 .set("Authorization", `Bearer ${otherAccessToken}`)
-                .field("title", "Updated Title")
-                .field("content", "Updated Content");
+                .field("text", "Updated Content");
 
             expect(res.status).toBe(403);
         });
@@ -168,8 +158,7 @@ describe("Post Routes", () => {
 
         beforeEach(async () => {
             const post = await Post.create({
-                title: "To be deleted",
-                content: "Will be deleted",
+                text: "Will be deleted",
                 owner: userId,
             });
             postId = post._id.toString();

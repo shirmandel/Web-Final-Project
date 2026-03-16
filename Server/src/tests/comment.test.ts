@@ -38,8 +38,7 @@ beforeEach(async () => {
     userId = res.body.user._id;
 
     const post = await Post.create({
-        title: "Test Post for Comments",
-        content: "Content",
+        text: "Content",
         owner: userId,
     });
     postId = post._id.toString();
@@ -58,7 +57,7 @@ describe("Comment Routes", () => {
             expect(res.body.postId).toBe(postId);
             expect(res.body.owner._id).toBe(userId);
 
-            const post = await Post.findById(postId);
+            const post = await Post.findById(postId).populate('commentsCount');
             expect(post?.commentsCount).toBe(1);
         });
 
@@ -115,8 +114,6 @@ describe("Comment Routes", () => {
                 owner: userId,
             });
             commentId = comment._id.toString();
-
-            await Post.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
         });
 
         it("should delete a comment successfully", async () => {
@@ -127,7 +124,7 @@ describe("Comment Routes", () => {
             expect(res.status).toBe(200);
             expect(res.body.message).toBe("Comment deleted successfully.");
 
-            const postAfter = await Post.findById(postId);
+            const postAfter = await Post.findById(postId).populate('commentsCount');
             expect(postAfter?.commentsCount).toBe(0);
         });
 
