@@ -213,10 +213,12 @@ export const googleLogin = async (
         googleId,
         profileImage: picture || "",
       });
-      console.log({ user });
       await user.save();
     } else if (!user.googleId) {
       user.googleId = googleId;
+      if (payload.picture && !user.profileImage) {
+        user.profileImage = payload.picture;
+      }
       await user.save();
     }
 
