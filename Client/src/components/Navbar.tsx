@@ -13,7 +13,6 @@ import {
   Home as HomeIcon,
   Add as AddIcon,
   Search as SearchIcon,
-  Person as PersonIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
@@ -98,19 +97,6 @@ const Navbar: React.FC = () => {
               }}
             >
               <AddIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="My Posts">
-            <IconButton
-              onClick={() => navigate("/my-posts")}
-              sx={{
-                color: isActive("/my-posts")
-                  ? "primary.main"
-                  : "primary.contrastText",
-              }}
-            >
-              <PersonIcon />
             </IconButton>
           </Tooltip>
 
