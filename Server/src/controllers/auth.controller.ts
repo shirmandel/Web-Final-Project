@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import User from "../models/user.model";
-import { log } from "node:console";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
