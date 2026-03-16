@@ -16,6 +16,7 @@ interface AuthContextType {
     email: string,
     username: string,
     password: string,
+    profileImage?: File,
   ) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -48,8 +49,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     email: string,
     username: string,
     password: string,
+    profileImage?: File,
   ) => {
-    const response = await authService.register(email, username, password);
+    const response = await authService.register(email, username, password, profileImage);
     setUser(response.user);
   };
 
