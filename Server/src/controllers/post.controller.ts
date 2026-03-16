@@ -239,6 +239,12 @@ export const searchPosts = async (req: AuthRequest, res: Response): Promise<void
       parsedQuery: parsed,
     });
   } catch (err) {
+    console.error('Search error:', err);
+    const status = (err as { status?: number }).status;
+    if (status === 429) {
+      res.status(503).json({ error: 'AI service is temporarily unavailable. Please try again later.' });
+      return;
+    }
     res.status(500).json({ error: 'Search failed. Please try again.' });
   }
 };

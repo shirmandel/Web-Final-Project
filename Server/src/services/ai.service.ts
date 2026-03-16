@@ -1,6 +1,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+let genAI: GoogleGenerativeAI | null = null;
+
+function getGenAI(): GoogleGenerativeAI {
+  if (!genAI) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    console.log("keyyy", process.env.GEMINI_API_KEY);
+
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not set in environment variables");
+    }
+    genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return genAI;
+}
 
 const SYSTEM_PROMPT = `You are a search query parser for a social media app.
 Given a user's free-text search query about posts, extract structured filters.
@@ -51,28 +64,55 @@ export async function parseSearchQuery(query: string): Promise<ParsedQuery> {
   const cached = getCached(normalizedQuery);
   if (cached) return cached;
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = getGenAI().getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
 
-  const result = await model.generateContent([
-    { text: SYSTEM_PROMPT },
-    { text: query },
-  ]);
+  const MAX_RETRIES = 2;
+  let lastError: unknown;
 
-  const responseText = result.response.text().trim();
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const result = await model.generateContent([
+        { text: SYSTEM_PROMPT },
+        { text: query },
+      ]);
 
-  // Strip markdown code block wrappers if present
-  const jsonText = responseText.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+      const responseText = result.response.text().trim();
 
-  const parsed: ParsedQuery = JSON.parse(jsonText);
+      // Strip markdown code block wrappers if present
+      const jsonText = responseText
+        .replace(/^```(?:json)?\s*/, "")
+        .replace(/\s*```$/, "");
 
-  // Whitelist only known fields
-  const sanitized: ParsedQuery = {
-    textSearch: typeof parsed.textSearch === "string" ? parsed.textSearch : null,
-    dateFrom: typeof parsed.dateFrom === "string" ? parsed.dateFrom : null,
-    dateTo: typeof parsed.dateTo === "string" ? parsed.dateTo : null,
-    username: typeof parsed.username === "string" ? parsed.username : null,
-  };
+      const parsed: ParsedQuery = JSON.parse(jsonText);
 
-  setCache(normalizedQuery, sanitized);
-  return sanitized;
+      // Whitelist only known fields
+      const sanitized: ParsedQuery = {
+        textSearch:
+          typeof parsed.textSearch === "string" ? parsed.textSearch : null,
+        dateFrom: typeof parsed.dateFrom === "string" ? parsed.dateFrom : null,
+        dateTo: typeof parsed.dateTo === "string" ? parsed.dateTo : null,
+        username: typeof parsed.username === "string" ? parsed.username : null,
+      };
+
+      setCache(normalizedQuery, sanitized);
+      return sanitized;
+    } catch (err: unknown) {
+      lastError = err;
+      const status = (err as { status?: number }).status;
+
+      // Don't retry on non-retryable errors
+      if (status === 429 && attempt < MAX_RETRIES) {
+        // Wait before retrying (exponential backoff)
+        await new Promise((resolve) =>
+          setTimeout(resolve, 2000 * (attempt + 1)),
+        );
+        continue;
+      }
+      break;
+    }
+  }
+
+  throw lastError;
 }

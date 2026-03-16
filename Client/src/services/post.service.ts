@@ -19,11 +19,25 @@ export interface PostsResponse {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
+  parsedQuery?: {
+    textSearch: string | null;
+    dateFrom: string | null;
+    dateTo: string | null;
+    username: string | null;
+  };
 }
 
 export const postService = {
   async getAll(page = 1, limit = 10): Promise<PostsResponse> {
     const { data } = await api.get(`/api/posts?page=${page}&limit=${limit}`);
+    return data;
+  },
+
+  async search(query: string, page = 1, limit = 10): Promise<PostsResponse> {
+    const { data } = await api.post(
+      `/api/posts/search?page=${page}&limit=${limit}`,
+      { query },
+    );
     return data;
   },
 
