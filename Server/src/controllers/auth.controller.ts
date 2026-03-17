@@ -40,10 +40,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const profileImage = req.file
+      ? `/uploads/${req.file.filename}`
+      : undefined;
+
     const user = new User({
       email,
       username,
       password: hashedPassword,
+      ...(profileImage && { profileImage }),
     });
 
     const savedUser = await user.save();
