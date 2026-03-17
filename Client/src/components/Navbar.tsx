@@ -74,19 +74,6 @@ const Navbar: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="AI Search">
-            <IconButton
-              onClick={() => navigate("/search")}
-              sx={{
-                color: isActive("/search")
-                  ? "primary.main"
-                  : "primary.contrastText",
-              }}
-            >
-              <SearchIcon />
-            </IconButton>
-          </Tooltip>
-
           <Tooltip title="New Post">
             <IconButton
               onClick={() => navigate("/create")}
