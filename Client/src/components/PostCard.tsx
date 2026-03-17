@@ -119,7 +119,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
         <CardMedia
           component="img"
           image={getImageUrl(post.image)}
-          alt={post.title}
+          alt={post.text}
           sx={{
             maxHeight: 500,
             objectFit: "cover",
