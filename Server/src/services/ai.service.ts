@@ -21,17 +21,14 @@ Return ONLY a valid JSON object with these optional fields:
 - "dateFrom": ISO date string for start date filter (string or null)  
 - "dateTo": ISO date string for end date filter (string or null)
 - "username": username to filter by post author (string or null)
-- "minLikes": minimum number of likes a post should have (number or null)
-- "minComments": minimum number of comments a post should have (number or null)
 
 Today's date is ${new Date().toISOString().split("T")[0]}.
 
 Examples:
-- "posts about cooking" → {"textSearch":"cooking cook recipe food kitchen","dateFrom":null,"dateTo":null,"username":null,"minLikes":null,"minComments":null}
-- "what did john post last week" → {"textSearch":null,"dateFrom":"<last week date>","dateTo":null,"username":"john","minLikes":null,"minComments":null}
-- "popular posts with more than 5 likes" → {"textSearch":null,"dateFrom":null,"dateTo":null,"username":null,"minLikes":5,"minComments":null}
-- "posts about cats" → {"textSearch":"cat cats kitten feline pet animal","dateFrom":null,"dateTo":null,"username":null,"minLikes":null,"minComments":null}
-- "dog photos" → {"textSearch":"dog dogs puppy canine pet photo picture","dateFrom":null,"dateTo":null,"username":null,"minLikes":null,"minComments":null}
+- "posts about cooking" → {"textSearch":"cooking cook recipe food kitchen","dateFrom":null,"dateTo":null,"username":null}
+- "what did john post last week" → {"textSearch":null,"dateFrom":"<last week date>","dateTo":null,"username":"john"}
+- "posts about cats" → {"textSearch":"cat cats kitten feline pet animal","dateFrom":null,"dateTo":null,"username":null}
+- "dog photos" → {"textSearch":"dog dogs puppy canine pet photo picture","dateFrom":null,"dateTo":null,"username":null}
 
 Return ONLY the JSON object, no markdown, no explanation.`;
 
@@ -40,8 +37,6 @@ export interface ParsedQuery {
   dateFrom: string | null;
   dateTo: string | null;
   username: string | null;
-  minLikes: number | null;
-  minComments: number | null;
 }
 
 // Simple in-memory cache with TTL
@@ -82,6 +77,8 @@ export async function parseSearchQuery(query: string): Promise<ParsedQuery> {
         { text: query },
       ]);
 
+      console.log("AI search query parser response:", result.response.text());
+
       const responseText = result.response.text().trim();
 
       // Strip markdown code block wrappers if present
@@ -98,8 +95,6 @@ export async function parseSearchQuery(query: string): Promise<ParsedQuery> {
         dateFrom: typeof parsed.dateFrom === "string" ? parsed.dateFrom : null,
         dateTo: typeof parsed.dateTo === "string" ? parsed.dateTo : null,
         username: typeof parsed.username === "string" ? parsed.username : null,
-        minLikes: typeof parsed.minLikes === "number" && parsed.minLikes > 0 ? parsed.minLikes : null,
-        minComments: typeof parsed.minComments === "number" && parsed.minComments > 0 ? parsed.minComments : null,
       };
 
       setCache(normalizedQuery, sanitized);

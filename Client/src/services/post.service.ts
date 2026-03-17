@@ -25,8 +25,6 @@ export interface PostsResponse {
     dateFrom: string | null;
     dateTo: string | null;
     username: string | null;
-    minLikes: number | null;
-    minComments: number | null;
   };
 }
 

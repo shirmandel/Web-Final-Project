@@ -226,32 +226,16 @@ export const searchPosts = async (req: AuthRequest, res: Response): Promise<void
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
-    // Fetch more posts than needed when filtering by likes/comments (virtuals)
-    const needsPostFilter = parsed.minLikes !== null || parsed.minComments !== null;
-    const fetchLimit = needsPostFilter ? limit * 5 : limit;
-    const fetchSkip = needsPostFilter ? 0 : skip;
 
-    let posts = await Post.find(filter)
+    const posts = await Post.find(filter)
       .populate('owner', 'username profileImage')
       .populate('likesCount')
       .populate('commentsCount')
       .sort({ createdAt: -1 })
-      .skip(fetchSkip)
-      .limit(needsPostFilter ? 0 : fetchLimit);
+      .skip(skip)
+      .limit(limit);
 
-    // Filter by virtual fields (likesCount / commentsCount) in memory
-    if (parsed.minLikes !== null) {
-      posts = posts.filter((p) => (p.likesCount ?? 0) >= parsed.minLikes!);
-    }
-    if (parsed.minComments !== null) {
-      posts = posts.filter((p) => (p.commentsCount ?? 0) >= parsed.minComments!);
-    }
-
-    const total = needsPostFilter ? posts.length : await Post.countDocuments(filter);
-
-    if (needsPostFilter) {
-      posts = posts.slice(skip, skip + limit);
-    }
+    const total = await Post.countDocuments(filter);
 
     res.status(200).json({
       posts,
