@@ -63,7 +63,6 @@ const FeedPage: React.FC = () => {
 
   useEffect(() => {
     loadPosts(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = () => {
