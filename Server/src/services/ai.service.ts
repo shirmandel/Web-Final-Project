@@ -5,8 +5,6 @@ let genAI: GoogleGenerativeAI | null = null;
 function getGenAI(): GoogleGenerativeAI {
   if (!genAI) {
     const apiKey = process.env.GEMINI_API_KEY;
-    console.log("keyyy", process.env.GEMINI_API_KEY);
-
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not set in environment variables");
     }
@@ -19,17 +17,21 @@ const SYSTEM_PROMPT = `You are a search query parser for a social media app.
 Given a user's free-text search query about posts, extract structured filters.
 
 Return ONLY a valid JSON object with these optional fields:
-- "textSearch": keywords to search in post text (string or null)
+- "textSearch": space-separated keywords to search in post text. Include the original word AND relevant variants (singular/plural, synonyms). For example: "cats" → "cat cats kitten feline pet". (string or null)
 - "dateFrom": ISO date string for start date filter (string or null)  
 - "dateTo": ISO date string for end date filter (string or null)
 - "username": username to filter by post author (string or null)
+- "minLikes": minimum number of likes a post should have (number or null)
+- "minComments": minimum number of comments a post should have (number or null)
 
 Today's date is ${new Date().toISOString().split("T")[0]}.
 
 Examples:
-- "posts about cooking" → {"textSearch":"cooking","dateFrom":null,"dateTo":null,"username":null}
-- "what did john post last week" → {"textSearch":null,"dateFrom":"<last week date>","dateTo":null,"username":"john"}
-- "pictures of dogs from march" → {"textSearch":"dogs","dateFrom":"2026-03-01","dateTo":"2026-03-31","username":null}
+- "posts about cooking" → {"textSearch":"cooking cook recipe food kitchen","dateFrom":null,"dateTo":null,"username":null,"minLikes":null,"minComments":null}
+- "what did john post last week" → {"textSearch":null,"dateFrom":"<last week date>","dateTo":null,"username":"john","minLikes":null,"minComments":null}
+- "popular posts with more than 5 likes" → {"textSearch":null,"dateFrom":null,"dateTo":null,"username":null,"minLikes":5,"minComments":null}
+- "posts about cats" → {"textSearch":"cat cats kitten feline pet animal","dateFrom":null,"dateTo":null,"username":null,"minLikes":null,"minComments":null}
+- "dog photos" → {"textSearch":"dog dogs puppy canine pet photo picture","dateFrom":null,"dateTo":null,"username":null,"minLikes":null,"minComments":null}
 
 Return ONLY the JSON object, no markdown, no explanation.`;
 
@@ -38,6 +40,8 @@ export interface ParsedQuery {
   dateFrom: string | null;
   dateTo: string | null;
   username: string | null;
+  minLikes: number | null;
+  minComments: number | null;
 }
 
 // Simple in-memory cache with TTL
@@ -94,6 +98,8 @@ export async function parseSearchQuery(query: string): Promise<ParsedQuery> {
         dateFrom: typeof parsed.dateFrom === "string" ? parsed.dateFrom : null,
         dateTo: typeof parsed.dateTo === "string" ? parsed.dateTo : null,
         username: typeof parsed.username === "string" ? parsed.username : null,
+        minLikes: typeof parsed.minLikes === "number" && parsed.minLikes > 0 ? parsed.minLikes : null,
+        minComments: typeof parsed.minComments === "number" && parsed.minComments > 0 ? parsed.minComments : null,
       };
 
       setCache(normalizedQuery, sanitized);
@@ -115,4 +121,60 @@ export async function parseSearchQuery(query: string): Promise<ParsedQuery> {
   }
 
   throw lastError;
+}
+
+const TAGS_PROMPT = `You are a content tagger for a social media app.
+Given a post's text content, extract 3-5 relevant semantic tags that describe the topics, themes, and subjects in the post.
+
+Return ONLY a JSON array of lowercase tag strings. Include:
+- Main subjects (e.g., "cat", "food", "travel")
+- Broader categories (e.g., "pet", "animal", "nature")
+- Related concepts that someone might search for
+
+Examples:
+- "I love my cat so much!" → ["cat", "pet", "animal", "love"]
+- "Beautiful sunset at the beach today" → ["sunset", "beach", "nature", "photography", "travel"]
+- "Just finished cooking pasta for dinner" → ["pasta", "cooking", "food", "dinner", "homemade"]
+
+Return ONLY the JSON array, no markdown, no explanation.`;
+
+export async function generateTags(text: string): Promise<string[]> {
+  if (!text || text.trim().length < 3) {
+    return [];
+  }
+
+  try {
+    const model = getGenAI().getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    const result = await model.generateContent([
+      { text: TAGS_PROMPT },
+      { text: text },
+    ]);
+
+    const responseText = result.response.text().trim();
+    console.log("AI tags response:", responseText);
+
+    // Strip markdown code block wrappers if present
+    const jsonText = responseText
+      .replace(/^```(?:json)?\s*/, "")
+      .replace(/\s*```$/, "");
+
+    const parsed = JSON.parse(jsonText);
+
+    // Validate and sanitize: must be array of strings
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    const tags = parsed
+      .filter((t): t is string => typeof t === "string")
+      .map((t) => t.toLowerCase().trim())
+      .filter((t) => t.length > 0 && t.length < 50)
+      .slice(0, 10); // Max 10 tags
+
+    return tags;
+  } catch (err) {
+    console.warn("Failed to generate tags:", (err as Error).message ?? err);
+    return []; // Non-blocking: return empty tags on failure
+  }
 }

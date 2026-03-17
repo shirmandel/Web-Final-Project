@@ -4,7 +4,7 @@ import Comment from '../models/comment.model';
 import Like from '../models/like.model';
 import User from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { parseSearchQuery } from '../services/ai.service';
+import { parseSearchQuery, generateTags } from '../services/ai.service';
 
 
 export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -61,10 +61,14 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
+    // Generate AI tags
+    const tags = await generateTags(text);
+
     const post = new Post({
       text,
       image: req.file ? `/uploads/${req.file.filename}` : '',
       owner: req.userId,
+      tags,
     });
 
     const savedPost = await post.save();
@@ -94,7 +98,11 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    if (req.body.text) post.text = req.body.text;
+    if (req.body.text) {
+      post.text = req.body.text;
+      // Regenerate tags when text changes
+      post.tags = await generateTags(req.body.text);
+    }
     if (req.file) post.image = `/uploads/${req.file.filename}`;
 
     const updatedPost = await post.save();
@@ -178,9 +186,7 @@ export const searchPosts = async (req: AuthRequest, res: Response): Promise<void
     const filter: Record<string, unknown> = {};
 
     if (parsed.textSearch) {
-      // Escape regex special characters to prevent ReDoS
-      const escaped = parsed.textSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      filter.text = { $regex: escaped, $options: 'i' };
+      filter.$text = { $search: parsed.textSearch };
     }
 
     if (parsed.dateFrom || parsed.dateTo) {
@@ -220,16 +226,32 @@ export const searchPosts = async (req: AuthRequest, res: Response): Promise<void
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
+    // Fetch more posts than needed when filtering by likes/comments (virtuals)
+    const needsPostFilter = parsed.minLikes !== null || parsed.minComments !== null;
+    const fetchLimit = needsPostFilter ? limit * 5 : limit;
+    const fetchSkip = needsPostFilter ? 0 : skip;
 
-    const posts = await Post.find(filter)
+    let posts = await Post.find(filter)
       .populate('owner', 'username profileImage')
       .populate('likesCount')
       .populate('commentsCount')
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .skip(fetchSkip)
+      .limit(needsPostFilter ? 0 : fetchLimit);
 
-    const total = await Post.countDocuments(filter);
+    // Filter by virtual fields (likesCount / commentsCount) in memory
+    if (parsed.minLikes !== null) {
+      posts = posts.filter((p) => (p.likesCount ?? 0) >= parsed.minLikes!);
+    }
+    if (parsed.minComments !== null) {
+      posts = posts.filter((p) => (p.commentsCount ?? 0) >= parsed.minComments!);
+    }
+
+    const total = needsPostFilter ? posts.length : await Post.countDocuments(filter);
+
+    if (needsPostFilter) {
+      posts = posts.slice(skip, skip + limit);
+    }
 
     res.status(200).json({
       posts,

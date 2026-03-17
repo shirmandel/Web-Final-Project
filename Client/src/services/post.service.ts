@@ -9,6 +9,7 @@ export interface Post {
     username: string;
     profileImage: string;
   };
+  tags?: string[];
   likesCount: number;
   commentsCount: number;
   createdAt: string;
@@ -24,6 +25,8 @@ export interface PostsResponse {
     dateFrom: string | null;
     dateTo: string | null;
     username: string | null;
+    minLikes: number | null;
+    minComments: number | null;
   };
 }
 
