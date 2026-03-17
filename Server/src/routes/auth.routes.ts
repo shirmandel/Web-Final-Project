@@ -6,6 +6,7 @@ import {
   logout,
   googleLogin,
 } from "../controllers/auth.controller";
+import upload from "../middleware/upload.middleware";
 
 const router = Router();
 
@@ -58,7 +59,7 @@ const router = Router();
  *       500:
  *         description: Server error
  */
-router.post("/register", register);
+router.post("/register", upload.single("profileImage"), register);
 
 /**
  * @swagger

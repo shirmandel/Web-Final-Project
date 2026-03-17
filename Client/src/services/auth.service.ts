@@ -18,11 +18,15 @@ export const authService = {
     email: string,
     username: string,
     password: string,
+    profileImage?: File,
   ): Promise<AuthResponse> {
-    const { data } = await api.post("/api/auth/register", {
-      email,
-      username,
-      password,
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("username", username);
+    formData.append("password", password);
+    if (profileImage) formData.append("profileImage", profileImage);
+    const { data } = await api.post("/api/auth/register", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     this.saveTokens(data);
     return data;
