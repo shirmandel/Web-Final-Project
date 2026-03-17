@@ -6,12 +6,14 @@ import {
   updatePost,
   deletePost,
   getPostsByUser,
+  searchPosts,
 } from "../controllers/post.controller";
 import authMiddleware from "../middleware/auth.middleware";
 import upload from "../middleware/upload.middleware";
 
 const router = Router();
 
+router.post("/search", authMiddleware, searchPosts);
 /**
  * @swagger
  * tags:

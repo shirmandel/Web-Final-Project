@@ -12,7 +12,6 @@ import {
 import {
   Home as HomeIcon,
   Add as AddIcon,
-  Search as SearchIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
@@ -71,19 +70,6 @@ const Navbar: React.FC = () => {
               }}
             >
               <HomeIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="AI Search">
-            <IconButton
-              onClick={() => navigate("/search")}
-              sx={{
-                color: isActive("/search")
-                  ? "primary.main"
-                  : "primary.contrastText",
-              }}
-            >
-              <SearchIcon />
             </IconButton>
           </Tooltip>
 

@@ -4,6 +4,7 @@ export interface IPost extends Document {
   text: string;
   image?: string;
   owner: Types.ObjectId;
+  tags: string[];
   likesCount: number;
   commentsCount: number;
 }
@@ -22,6 +23,10 @@ const postSchema = new Schema<IPost>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    tags: {
+      type: [String],
+      default: [],
     },
   },
   {
@@ -44,5 +49,7 @@ postSchema.virtual('commentsCount', {
   foreignField: 'postId',
   count: true
 });
+
+postSchema.index({ text: 'text', tags: 'text' }, { default_language: 'english' });
 
 export default mongoose.model<IPost>('Post', postSchema);
