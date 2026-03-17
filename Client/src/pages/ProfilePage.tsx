@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Container,
   Typography,
-  Avatar,
-  Button,
   CircularProgress,
-  Paper,
   Divider,
+  ImageList,
+  ImageListItem,
+  Dialog,
 } from "@mui/material";
+import {
+  GridView as GridViewIcon,
+  Favorite as FavoriteIcon,
+  ChatBubbleOutline as CommentIcon,
+} from "@mui/icons-material";
 import PostCard from "../components/PostCard";
+import ProfileHeader from "../components/ProfileHeader";
 import { useAuth } from "../context/AuthContext";
 import type { User } from "../services/auth.service";
-import { Edit as EditIcon } from "@mui/icons-material";
 import { userService } from "../services/user.service";
 import { postService, type Post } from "../services/post.service";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const ProfilePage: React.FC = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   const isOwnProfile = currentUser?._id === id;
 
@@ -81,69 +86,97 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Paper
-        sx={{
-          p: 4,
-          mb: 3,
-          textAlign: "center",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.06)",
-        }}
-      >
-        <Avatar
-          src={getImageUrl(profile.profileImage)}
-          sx={{
-            width: 100,
-            height: 100,
-            mx: "auto",
-            mb: 2,
-            border: "3px solid",
-            borderColor: "primary.main",
-            fontSize: 40,
-          }}
-        >
-          {profile.username?.charAt(0).toUpperCase()}
-        </Avatar>
-
-        <Typography variant="h5" fontWeight={700}>
-          {profile.username}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" mb={2}>
-          {profile.email}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {posts.length} posts
-        </Typography>
-
-        {isOwnProfile && (
-          <Button
-            variant="outlined"
-            startIcon={<EditIcon />}
-            onClick={() => navigate("/edit-profile")}
-            sx={{ mt: 2 }}
-          >
-            Edit Profile
-          </Button>
-        )}
-      </Paper>
+    <Container maxWidth="md" sx={{ py: 3 }}>
+      <ProfileHeader
+        profile={profile}
+        postsCount={posts.length}
+        isOwnProfile={isOwnProfile}
+      />
 
       <Divider sx={{ mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Posts
-        </Typography>
+        <GridViewIcon sx={{ fontSize: 20, color: "text.secondary" }} />
       </Divider>
 
-      {posts.map((post) => (
-        <PostCard key={post._id} post={post} onDelete={handleDelete} />
-      ))}
-
-      {posts.length === 0 && (
+      {posts.length > 0 ? (
+        <ImageList cols={3} gap={3} sx={{ m: 0 }}>
+          {posts.map((post) => (
+            <ImageListItem
+              key={post._id}
+              onClick={() => setSelectedPost(post)}
+              sx={{
+                cursor: "pointer",
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+                position: "relative",
+                "&:hover .overlay": {
+                  opacity: 1,
+                },
+              }}
+            >
+              <img
+                src={getImageUrl(post.image)}
+                alt={post.text || "post"}
+                loading="lazy"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+              <Box
+                className="overlay"
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  bgcolor: "rgba(0, 0, 0, 0.45)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 3,
+                  opacity: 0,
+                  transition: "opacity 0.2s ease",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <FavoriteIcon sx={{ color: "#fff", fontSize: 20 }} />
+                  <Typography fontWeight={700} color="#fff" fontSize={14}>
+                    {post.likesCount}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <CommentIcon sx={{ color: "#fff", fontSize: 20 }} />
+                  <Typography fontWeight={700} color="#fff" fontSize={14}>
+                    {post.commentsCount}
+                  </Typography>
+                </Box>
+              </Box>
+            </ImageListItem>
+          ))}
+        </ImageList>
+      ) : (
         <Typography color="text.secondary" textAlign="center" mt={2}>
           No posts yet.
         </Typography>
       )}
+
+      <Dialog
+        open={!!selectedPost}
+        onClose={() => setSelectedPost(null)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { background: "transparent", boxShadow: "none" } }}
+      >
+        {selectedPost && (
+          <PostCard
+            post={selectedPost}
+            onDelete={(id) => {
+              handleDelete(id);
+              setSelectedPost(null);
+            }}
+          />
+        )}
+      </Dialog>
     </Container>
   );
 };
