@@ -5,7 +5,7 @@ import PostCard from "../components/PostCard";
 
 const FeedPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
+  const [, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
