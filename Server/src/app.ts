@@ -30,4 +30,10 @@ app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.get("/{*splat}", (_req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
+
 export default app;
