@@ -12,7 +12,6 @@ import {
 import {
   Home as HomeIcon,
   Add as AddIcon,
-  Search as SearchIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
