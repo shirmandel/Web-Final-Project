@@ -22,8 +22,8 @@ mongoose
       });
     } else {
       const certOptions = {
-        key: fs.readFileSync("../client-key.pem"),
-        cert: fs.readFileSync("../client-cert.pem"),
+        key: fs.readFileSync("./client-key.pem"),
+        cert: fs.readFileSync("./client-cert.pem"),
       };
       https
         .createServer(certOptions, app)
