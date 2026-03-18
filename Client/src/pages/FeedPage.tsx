@@ -1,13 +1,26 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Box, CircularProgress, Typography, Container } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Container,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Chip,
+} from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { postService, type Post } from "../services/post.service";
 import PostCard from "../components/PostCard";
 
 const FeedPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
+  const [, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
   const loadPosts = useCallback(
@@ -29,20 +42,74 @@ const FeedPage: React.FC = () => {
     [loading],
   );
 
+  const searchPosts = useCallback(
+    async (query: string, pageNum: number) => {
+      if (searchLoading) return;
+      setSearchLoading(true);
+      try {
+        const data = await postService.search(query, pageNum, 10);
+        setPosts((prev) =>
+          pageNum === 1 ? data.posts : [...prev, ...data.posts],
+        );
+        setHasMore(pageNum < data.totalPages);
+      } catch (err) {
+        console.error("Search failed:", err);
+      } finally {
+        setSearchLoading(false);
+      }
+    },
+    [searchLoading],
+  );
+
   useEffect(() => {
     loadPosts(1);
   }, []);
 
+  const handleSearch = () => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed) {
+      if (activeSearch) {
+        setActiveSearch("");
+        setPage(1);
+        setPosts([]);
+        loadPosts(1);
+      }
+      return;
+    }
+    setActiveSearch(trimmed);
+    setPage(1);
+    setPosts([]);
+    searchPosts(trimmed, 1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setActiveSearch("");
+    setPage(1);
+    setPosts([]);
+    loadPosts(1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const lastPostRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return;
+      if (loading || searchLoading) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
           setPage((prev) => {
             const nextPage = prev + 1;
-            loadPosts(nextPage);
+            if (activeSearch) {
+              searchPosts(activeSearch, nextPage);
+            } else {
+              loadPosts(nextPage);
+            }
             return nextPage;
           });
         }
@@ -50,7 +117,7 @@ const FeedPage: React.FC = () => {
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, loadPosts],
+    [loading, searchLoading, hasMore, loadPosts, searchPosts, activeSearch],
   );
 
   const handleDelete = async (id: string) => {
@@ -78,9 +145,52 @@ const FeedPage: React.FC = () => {
         Feed
       </Typography>
 
-      {posts.length === 0 && !loading && (
+      <TextField
+        fullWidth
+        placeholder='Try "posts about food from last week"'
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+        sx={{
+          mb: 2,
+          "& .MuiOutlinedInput-root": {
+            background: "rgba(255, 255, 255, 0.8)",
+            backdropFilter: "blur(12px)",
+            borderRadius: 2,
+          },
+        }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleSearch} edge="end" aria-label="search">
+                <SearchIcon color="primary" />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      {activeSearch && (
+        <Box mb={2}>
+          <Chip
+            label={`Search: "${activeSearch}"`}
+            onDelete={handleClearSearch}
+            color="primary"
+            variant="outlined"
+          />
+        </Box>
+      )}
+
+      {posts.length === 0 && !loading && !searchLoading && (
         <Typography color="text.secondary" textAlign="center" mt={4}>
-          No posts yet. Be the first to share something! ✨
+          {activeSearch
+            ? "No posts found for your search."
+            : "No posts yet. Be the first to share something! ✨"}
         </Typography>
       )}
 
@@ -93,7 +203,7 @@ const FeedPage: React.FC = () => {
         </Box>
       ))}
 
-      {loading && (
+      {(loading || searchLoading) && (
         <Box display="flex" justifyContent="center" py={3}>
           <CircularProgress color="primary" />
         </Box>

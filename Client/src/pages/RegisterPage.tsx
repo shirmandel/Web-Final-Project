@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   TextField,
@@ -8,7 +8,11 @@ import {
   Alert,
   Divider,
   CircularProgress,
+  Avatar,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -22,6 +26,17 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+      setProfilePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +65,7 @@ const RegisterPage: React.FC = () => {
 
     setLoading(true);
     try {
-      await register(email, username, password);
+      await register(email, username, password, profileImage ?? undefined);
       navigate("/");
     } catch (err: unknown) {
       const message =
@@ -126,6 +141,48 @@ const RegisterPage: React.FC = () => {
             {error}
           </Alert>
         )}
+
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <Box sx={{ position: "relative", display: "inline-block" }}>
+            <Avatar
+              src={profilePreview ?? undefined}
+              sx={{
+                width: 88,
+                height: 88,
+                border: "3px solid",
+                borderColor: "primary.light",
+                fontSize: "2rem",
+              }}
+            >
+              {!profilePreview && username ? username[0].toUpperCase() : null}
+            </Avatar>
+            <Tooltip title="Upload profile picture">
+              <IconButton
+                size="small"
+                onClick={() => fileInputRef.current?.click()}
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  bgcolor: "primary.main",
+                  color: "white",
+                  "&:hover": { bgcolor: "primary.dark" },
+                  width: 28,
+                  height: 28,
+                }}
+              >
+                <AddAPhotoIcon sx={{ fontSize: 15 }} />
+              </IconButton>
+            </Tooltip>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
+          </Box>
+        </Box>
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField

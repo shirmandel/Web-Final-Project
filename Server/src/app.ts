@@ -1,6 +1,8 @@
 import cors from "cors";
 import path from "path";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 import postRoutes from "./routes/post.routes";
@@ -20,6 +22,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
@@ -28,6 +32,12 @@ app.use("/api/likes", likeRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "OK" });
+});
+
+app.use(express.static(path.join(__dirname, "../public/app")));
+
+app.get("/{*splat}", (_req, res) => {
+  res.sendFile(path.join(__dirname, "../public/app/index.html"));
 });
 
 export default app;
