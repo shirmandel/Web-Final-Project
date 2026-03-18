@@ -15,7 +15,6 @@ import {
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -79,8 +78,6 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-
-
   return (
     <Box
       sx={{
@@ -101,12 +98,12 @@ const RegisterPage: React.FC = () => {
           backdropFilter: "blur(28px)",
           border: "1px solid rgba(200, 232, 229, 0.7)",
           borderRadius: "20px",
-          boxShadow: "0 12px 48px rgba(13, 53, 51, 0.1), 0 2px 12px rgba(0,0,0,0.04)",
+          boxShadow:
+            "0 12px 48px rgba(13, 53, 51, 0.1), 0 2px 12px rgba(0,0,0,0.04)",
           position: "relative",
           zIndex: 1,
         }}
       >
-
         <Typography
           variant="h4"
           textAlign="center"
@@ -265,7 +262,12 @@ const RegisterPage: React.FC = () => {
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ px: 1, fontSize: "0.7rem", letterSpacing: "0.08em", fontWeight: 600 }}
+            sx={{
+              px: 1,
+              fontSize: "0.7rem",
+              letterSpacing: "0.08em",
+              fontWeight: 600,
+            }}
           >
             OR
           </Typography>
