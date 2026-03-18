@@ -104,7 +104,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
           </Typography>
         }
         subheader={
-          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontSize: "0.72rem" }}
+          >
             {timeAgo}
           </Typography>
         }
@@ -117,7 +121,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
                 sx={{
                   color: "text.secondary",
                   borderRadius: "8px",
-                  "&:hover": { bgcolor: "rgba(18,153,144,0.08)", color: "primary.main" },
+                  "&:hover": {
+                    bgcolor: "rgba(18,153,144,0.08)",
+                    color: "primary.main",
+                  },
                 }}
               >
                 <EditIcon fontSize="small" />
@@ -128,7 +135,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
                 sx={{
                   color: "text.secondary",
                   borderRadius: "8px",
-                  "&:hover": { bgcolor: "rgba(211,47,47,0.08)", color: "error.main" },
+                  "&:hover": {
+                    bgcolor: "rgba(211,47,47,0.08)",
+                    color: "error.main",
+                  },
                 }}
               >
                 <DeleteIcon fontSize="small" />
@@ -175,8 +185,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
             sx={{
               color: liked ? "#E53935" : "text.secondary",
               transform: likeAnim ? "scale(1.4)" : "scale(1)",
-              transition: "transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease",
-              "&:hover": { bgcolor: "rgba(229,57,53,0.08)", transform: "scale(1.15)" },
+              transition:
+                "transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease",
+              "&:hover": {
+                bgcolor: "rgba(229,57,53,0.08)",
+                transform: "scale(1.15)",
+              },
               borderRadius: "8px",
             }}
           >
@@ -207,7 +221,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
             sx={{
               color: "text.secondary",
               borderRadius: "8px",
-              "&:hover": { bgcolor: "rgba(18,153,144,0.08)", color: "primary.main" },
+              "&:hover": {
+                bgcolor: "rgba(18,153,144,0.08)",
+                color: "primary.main",
+              },
             }}
           >
             <CommentIcon sx={{ fontSize: "1.1rem" }} />

@@ -73,6 +73,15 @@ const PostDetailPage: React.FC = () => {
     }
   };
 
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await postService.delete(postId);
+      navigate("/");
+    } catch (err) {
+      console.error("Failed to delete post:", err);
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
@@ -115,7 +124,7 @@ const PostDetailPage: React.FC = () => {
 
       <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
         <Box sx={{ flex: "0 0 auto", width: { xs: "100%", md: "50%" } }}>
-          <PostCard post={post} />
+          <PostCard post={post} onDelete={handleDeletePost} />
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
