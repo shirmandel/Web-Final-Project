@@ -22,6 +22,7 @@ import { type Post } from "../services/post.service";
 import { likeService } from "../services/like.service";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../config";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 
 interface PostCardProps {
   post: Post;
@@ -34,6 +35,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likesCount);
   const [likeAnim, setLikeAnim] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -130,7 +132,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
                 <EditIcon fontSize="small" />
               </IconButton>
               <IconButton
-                onClick={() => onDelete?.(post._id)}
+                onClick={() => setDeleteDialogOpen(true)}
                 size="small"
                 sx={{
                   color: "text.secondary",
@@ -237,6 +239,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onDelete }) => {
           </Typography>
         </Box>
       </CardActions>
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => {
+          setDeleteDialogOpen(false);
+          onDelete?.(post._id);
+        }}
+      />
     </Card>
   );
 };
