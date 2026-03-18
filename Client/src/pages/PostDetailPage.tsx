@@ -76,7 +76,11 @@ const PostDetailPage: React.FC = () => {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
-        <CircularProgress size={36} thickness={4} sx={{ color: "primary.main" }} />
+        <CircularProgress
+          size={36}
+          thickness={4}
+          sx={{ color: "primary.main" }}
+        />
       </Box>
     );
   }
@@ -91,7 +95,6 @@ const PostDetailPage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      {/* Back button */}
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate(-1)}
@@ -101,19 +104,20 @@ const PostDetailPage: React.FC = () => {
           color: "text.secondary",
           borderRadius: "20px",
           px: 1.5,
-          "&:hover": { bgcolor: "rgba(18,153,144,0.07)", color: "primary.main" },
+          "&:hover": {
+            bgcolor: "rgba(18,153,144,0.07)",
+            color: "primary.main",
+          },
         }}
       >
         Back
       </Button>
 
       <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
-        {/* Post Card */}
         <Box sx={{ flex: "0 0 auto", width: { xs: "100%", md: "50%" } }}>
           <PostCard post={post} />
         </Box>
 
-        {/* Comments Panel */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <CommentSection
             comments={comments}

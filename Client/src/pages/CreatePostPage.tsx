@@ -9,10 +9,7 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
-import {
-  CloudUpload as UploadIcon,
-  AddPhotoAlternate as PhotoIcon,
-} from "@mui/icons-material";
+import { AddPhotoAlternate as PhotoIcon } from "@mui/icons-material";
 import { postService } from "../services/post.service";
 
 const CreatePostPage: React.FC = () => {
@@ -57,7 +54,6 @@ const CreatePostPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      {/* Heading */}
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="h5"
@@ -111,7 +107,6 @@ const CreatePostPage: React.FC = () => {
             }}
           />
 
-          {/* Drop zone style upload */}
           <Box
             component="label"
             htmlFor="create-image-input"
@@ -124,7 +119,9 @@ const CreatePostPage: React.FC = () => {
               mb: 2,
               py: 2.5,
               border: "2px dashed",
-              borderColor: imagePreview ? "primary.main" : "rgba(144,209,202,0.7)",
+              borderColor: imagePreview
+                ? "primary.main"
+                : "rgba(144,209,202,0.7)",
               borderRadius: "14px",
               background: imagePreview
                 ? "rgba(18,153,144,0.04)"
@@ -137,11 +134,17 @@ const CreatePostPage: React.FC = () => {
               },
             }}
           >
-            <PhotoIcon sx={{ fontSize: "2rem", color: "primary.light", mb: 0.75 }} />
+            <PhotoIcon
+              sx={{ fontSize: "2rem", color: "primary.light", mb: 0.75 }}
+            />
             <Typography variant="body2" fontWeight={600} color="primary.dark">
               {image ? `📎 ${image.name}` : "Click to upload image"}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 0.25 }}
+            >
               PNG, JPG, WEBP supported
             </Typography>
             <input

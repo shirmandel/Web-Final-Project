@@ -73,7 +73,6 @@ const EditProfilePage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      {/* Heading */}
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="h5"
@@ -115,7 +114,6 @@ const EditProfilePage: React.FC = () => {
         )}
 
         <Box component="form" onSubmit={handleSubmit} textAlign="center">
-          {/* Avatar with gradient ring */}
           <Box
             sx={{
               display: "inline-flex",

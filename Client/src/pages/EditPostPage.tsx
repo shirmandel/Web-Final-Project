@@ -88,7 +88,6 @@ const EditPostPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      {/* Heading */}
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="h5"
@@ -137,7 +136,6 @@ const EditPostPage: React.FC = () => {
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
           />
 
-          {/* Drop zone style upload */}
           <Box
             component="label"
             htmlFor="edit-image-input"

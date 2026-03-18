@@ -139,7 +139,6 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
         }}
       />
 
-      {/* Active search chip */}
       {activeSearch && (
         <Box sx={{ mb: 1.5 }}>
           <Typography

@@ -46,7 +46,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         position: "relative",
       }}
     >
-      {/* Subtle top edge gradient line instead of massive banner */}
       <Box
         sx={{
           position: "absolute",
@@ -66,7 +65,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           gap: { xs: 2.5, sm: 4 },
         }}
       >
-        {/* Avatar Ring */}
         <Box
           sx={{
             flexShrink: 0,
@@ -90,7 +88,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </Avatar>
         </Box>
 
-        {/* User Info & Stats */}
         <Box sx={{ flex: 1, textAlign: { xs: "center", sm: "left" } }}>
           <Typography variant="h4" fontWeight={800} sx={{ mb: 0.25 }}>
             {profile.username}
