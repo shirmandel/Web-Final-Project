@@ -66,7 +66,6 @@ export const createPost = async (
       return;
     }
 
-    // Generate AI tags
     const tags = await generateTags({ caption: text });
 
     const post = new Post({
@@ -109,7 +108,6 @@ export const updatePost = async (
 
     if (req.body.text) {
       post.text = req.body.text;
-      // Regenerate tags when text changes
       post.tags = await generateTags({ caption: req.body.text });
     }
     if (req.file) post.image = `/uploads/${req.file.filename}`;
@@ -203,7 +201,6 @@ export const searchPosts = async (
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    // Search by tags (including original query as fallback)
     const searchTags = [...keywords, query.trim().toLowerCase()];
     const posts = await Post.find({ tags: { $in: searchTags } })
       .populate("owner", "username profileImage")
