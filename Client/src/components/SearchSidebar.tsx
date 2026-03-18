@@ -22,10 +22,9 @@ interface SearchSidebarProps {
   onSearch: () => void;
   onClear: () => void;
 }
-
 const SEARCH_TIPS = [
   "Try searching by topic",
-  "Search for a username",
+  "Search by keywords or tags",
   "Use keywords from the post",
 ];
 
@@ -47,7 +46,7 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
         position: "sticky",
         top: 80,
         p: 4,
-        minHeight: '85vh',
+        minHeight: "85vh",
         background: "rgba(255, 255, 255, 0.88)",
         backdropFilter: "blur(18px)",
         border: "1px solid rgba(200, 232, 229, 0.8)",
@@ -107,7 +106,9 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon sx={{ color: "text.secondary", fontSize: "1.1rem" }} />
+              <SearchIcon
+                sx={{ color: "text.secondary", fontSize: "1.1rem" }}
+              />
             </InputAdornment>
           ),
           endAdornment: searchQuery ? (
@@ -141,7 +142,11 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
       {/* Active search chip */}
       {activeSearch && (
         <Box sx={{ mb: 1.5 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mb: 0.5, display: "block" }}
+          >
             Showing results for:
           </Typography>
           <Chip
@@ -159,7 +164,16 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 1.5 }}>
           <TipIcon sx={{ fontSize: "0.95rem", color: "primary.main" }} />
-          <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.68rem" }}>
+          <Typography
+            variant="caption"
+            fontWeight={700}
+            color="text.secondary"
+            sx={{
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              fontSize: "0.68rem",
+            }}
+          >
             Search Tips
           </Typography>
         </Box>
@@ -188,7 +202,11 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
                   flexShrink: 0,
                 }}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.78rem", lineHeight: 1.4 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontSize: "0.78rem", lineHeight: 1.4 }}
+              >
                 {tip}
               </Typography>
             </Box>
