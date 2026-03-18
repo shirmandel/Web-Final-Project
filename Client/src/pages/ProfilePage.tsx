@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
@@ -8,8 +8,8 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
-import PostCard from "../components/PostCard";
 import ProfileHeader from "../components/ProfileHeader";
+import ProfileGridPost from "../components/ProfileGridPost";
 import { useAuth } from "../context/AuthContext";
 import type { User } from "../services/auth.service";
 import { userService } from "../services/user.service";
@@ -17,6 +17,7 @@ import { postService, type Post } from "../services/post.service";
 
 const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -43,16 +44,6 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [id]);
 
-  const handleDelete = async (postId: string) => {
-    if (!window.confirm("Delete this post?")) return;
-    try {
-      await postService.delete(postId);
-      setPosts((prev) => prev.filter((p) => p._id !== postId));
-    } catch (err) {
-      console.error("Failed to delete:", err);
-    }
-  };
-
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={6}>
@@ -70,48 +61,66 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={{ py: 4 }}>
       <ProfileHeader
         profile={profile}
         posts={posts}
         isOwnProfile={isOwnProfile}
       />
 
-      <Divider sx={{ mb: 3 }}>
-        <Chip
-          label="Posts"
-          size="small"
-          sx={{
-            fontWeight: 700,
-            bgcolor: "rgba(18,153,144,0.1)",
-            color: "primary.dark",
-            border: "1px solid rgba(18,153,144,0.2)",
-          }}
-        />
-      </Divider>
+      <Box sx={{ width: "100%", mx: "auto" }}>
+        <Divider sx={{ mb: 3 }}>
+          <Chip
+            label="Posts grid"
+            size="small"
+            sx={{
+              fontWeight: 700,
+              bgcolor: "rgba(18,153,144,0.1)",
+              color: "primary.dark",
+              border: "1px solid rgba(18,153,144,0.2)",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              fontSize: "0.65rem",
+            }}
+          />
+        </Divider>
 
-      {posts.map((post) => (
-        <PostCard key={post._id} post={post} onDelete={handleDelete} />
-      ))}
-
-      {posts.length === 0 && (
         <Box
           sx={{
-            textAlign: "center",
-            py: 6,
-            borderRadius: 3,
-            background: "rgba(255,255,255,0.6)",
-            border: "1.5px dashed rgba(144,209,202,0.5)",
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: { xs: 0.5, sm: 2 },
           }}
         >
-          <Typography variant="h4" sx={{ mb: 1, fontSize: "2rem" }}>
-            📝
-          </Typography>
-          <Typography color="text.secondary" fontWeight={500}>
-            No posts yet.
-          </Typography>
+          {posts.map((post) => (
+            <ProfileGridPost
+              key={post._id}
+              post={post}
+              onClick={() => navigate(`/post/${post._id}`)}
+            />
+          ))}
         </Box>
-      )}
+
+        {posts.length === 0 && (
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 6,
+              borderRadius: 3,
+              background: "rgba(255,255,255,0.6)",
+              border: "1.5px dashed rgba(144,209,202,0.5)",
+              mt: 2,
+            }}
+          >
+            <Typography variant="h4" sx={{ mb: 1, fontSize: "2rem" }}>
+              📝
+            </Typography>
+            <Typography color="text.secondary" fontWeight={500}>
+              No posts yet.
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </Container>
   );
 };

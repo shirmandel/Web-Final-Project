@@ -36,99 +36,117 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     <Paper
       elevation={0}
       sx={{
-        mb: 3,
+        mb: 4,
         overflow: "hidden",
         background: "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(20px)",
         border: "1px solid rgba(200, 232, 229, 0.8)",
         borderRadius: "16px",
         boxShadow: "0 4px 24px rgba(13, 53, 51, 0.08)",
+        p: { xs: 3, sm: 4 },
+        position: "relative",
       }}
     >
+      {/* Subtle top edge gradient line instead of massive banner */}
       <Box
         sx={{
-          height: 110,
-          background:
-            "linear-gradient(135deg, #129990 0%, #096B68 60%, #064845 100%)",
-          position: "relative",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 6,
+          background: "linear-gradient(135deg, #129990, #096B68)",
+        }}
+      />
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: "center",
+          gap: { xs: 2.5, sm: 4 },
         }}
       >
+        {/* Avatar Ring */}
         <Box
           sx={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.07) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%)",
+            flexShrink: 0,
+            borderRadius: "50%",
+            p: "4px",
+            background: "linear-gradient(135deg, #129990, #096B68)",
+            boxShadow: "0 4px 24px rgba(18, 153, 144, 0.25)",
           }}
-        />
-      </Box>
-
-      <Box sx={{ px: 3, pb: 3, textAlign: "center" }}>
-        <Box sx={{ mt: "-50px", mb: 1.5, display: "flex", justifyContent: "center" }}>
-          <Box
+        >
+          <Avatar
+            src={getImageUrl(profile.profileImage)}
             sx={{
-              borderRadius: "50%",
-              p: "3px",
+              width: 100,
+              height: 100,
+              border: "4px solid white",
+              fontSize: "2.5rem",
               background: "linear-gradient(135deg, #129990, #096B68)",
-              display: "inline-block",
-              boxShadow: "0 4px 20px rgba(18, 153, 144, 0.35)",
             }}
           >
-            <Avatar
-              src={getImageUrl(profile.profileImage)}
+            {profile.username?.charAt(0).toUpperCase()}
+          </Avatar>
+        </Box>
+
+        {/* User Info & Stats */}
+        <Box sx={{ flex: 1, textAlign: { xs: "center", sm: "left" } }}>
+          <Typography variant="h4" fontWeight={800} sx={{ mb: 0.25 }}>
+            {profile.username}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 1.5 }}>
+            {profile.email}
+          </Typography>
+
+          <Box sx={{ display: "flex", justifyContent: { xs: "center", sm: "flex-start" }, mt: 1 }}>
+            <Box
               sx={{
-                width: 88,
-                height: 88,
-                border: "3px solid white",
-                fontSize: "2rem",
-                background: "linear-gradient(135deg, #129990, #096B68)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 1,
+                bgcolor: "rgba(18,153,144,0.06)",
+                border: "1px solid rgba(18,153,144,0.15)",
+                px: 2,
+                py: 0.75,
+                borderRadius: "12px",
               }}
             >
-              {profile.username?.charAt(0).toUpperCase()}
-            </Avatar>
+              <Typography variant="subtitle1" fontWeight={800} color="primary.main" sx={{ lineHeight: 1 }}>
+                {posts.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" fontWeight={700} sx={{ lineHeight: 1 }}>
+                POSTS
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
-        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.25 }}>
-          {profile.username}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {profile.email}
-        </Typography>
-
-        {/* Stats row */}
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 2 }}>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography variant="h6" fontWeight={800} color="primary.main">
-              {posts.length}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" fontWeight={500}>
-              Posts
-            </Typography>
-          </Box>
+        <Box sx={{ alignSelf: { xs: "center", sm: "flex-start" } }}>
+          {isOwnProfile && (
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              onClick={() => navigate("/edit-profile")}
+              size="small"
+              sx={{
+                borderRadius: "20px",
+                px: 3,
+                py: 0.8,
+                borderColor: "primary.main",
+                color: "primary.dark",
+                fontWeight: 700,
+                "&:hover": {
+                  borderColor: "primary.dark",
+                  bgcolor: "rgba(18, 153, 144, 0.06)",
+                },
+              }}
+            >
+              Edit Profile
+            </Button>
+          )}
         </Box>
-
-        {isOwnProfile && (
-          <Button
-            variant="outlined"
-            startIcon={<EditIcon />}
-            onClick={() => navigate("/edit-profile")}
-            size="small"
-            sx={{
-              borderRadius: "20px",
-              px: 2.5,
-              borderColor: "primary.main",
-              color: "primary.dark",
-              fontWeight: 700,
-              "&:hover": {
-                borderColor: "primary.dark",
-                bgcolor: "rgba(18, 153, 144, 0.06)",
-              },
-            }}
-          >
-            Edit Profile
-          </Button>
-        )}
       </Box>
     </Paper>
   );
