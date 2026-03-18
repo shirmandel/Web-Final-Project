@@ -5,6 +5,7 @@ import PostCard from "../components/PostCard";
 import SearchSidebar from "../components/SearchSidebar";
 
 const FeedPage: React.FC = () => {
+  const LIMIT = 10;
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -23,8 +24,8 @@ const FeedPage: React.FC = () => {
 
     try {
       const data = search
-        ? await postService.search(search, pageNum, 10)
-        : await postService.getAll(pageNum, 10);
+        ? await postService.search(search, pageNum, LIMIT)
+        : await postService.getAll(pageNum, LIMIT);
 
       setPosts((prev) => {
         if (pageNum === 1) return data.posts;
