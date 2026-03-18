@@ -9,7 +9,7 @@ import {
   IconButton,
   Chip,
 } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Close as CloseIcon } from "@mui/icons-material";
 import { postService, type Post } from "../services/post.service";
 import PostCard from "../components/PostCard";
 
@@ -132,66 +132,103 @@ const FeedPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Typography
-        variant="h5"
-        fontWeight={700}
-        sx={(theme) => ({
-          mb: 3,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        })}
-      >
-        Feed
-      </Typography>
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="h5"
+          fontWeight={800}
+          sx={(theme) => ({
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.02em",
+          })}
+        >
+          Your Feed
+        </Typography>
+      </Box>
 
       <TextField
         fullWidth
-        placeholder='Try "posts about food from last week"'
+        placeholder='Search posts...'
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         onKeyDown={handleKeyDown}
         sx={{
-          mb: 2,
+          mb: 2.5,
           "& .MuiOutlinedInput-root": {
-            background: "rgba(255, 255, 255, 0.8)",
+            background: "rgba(255, 255, 255, 0.9)",
             backdropFilter: "blur(12px)",
-            borderRadius: 2,
+            borderRadius: "30px",
+            boxShadow: "0 2px 12px rgba(13, 53, 51, 0.08)",
+            "& fieldset": { borderColor: "rgba(144, 209, 202, 0.6)" },
+            "&:hover fieldset": { borderColor: "primary.main" },
           },
         }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon color="action" />
+              <SearchIcon sx={{ color: "text.secondary", fontSize: "1.2rem", ml: 0.5 }} />
             </InputAdornment>
           ),
-          endAdornment: (
+          endAdornment: searchQuery ? (
             <InputAdornment position="end">
-              <IconButton onClick={handleSearch} edge="end" aria-label="search">
-                <SearchIcon color="primary" />
+              <IconButton
+                size="small"
+                onClick={handleClearSearch}
+                sx={{ mr: 0.5, color: "text.secondary" }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                onClick={handleSearch}
+                size="small"
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "white",
+                  mr: 0.5,
+                  borderRadius: "8px",
+                  "&:hover": { bgcolor: "primary.dark" },
+                }}
+              >
+                <SearchIcon fontSize="small" />
               </IconButton>
             </InputAdornment>
-          ),
+          ) : null,
         }}
       />
 
       {activeSearch && (
-        <Box mb={2}>
+        <Box mb={2.5}>
           <Chip
-            label={`Search: "${activeSearch}"`}
+            label={`Results for "${activeSearch}"`}
             onDelete={handleClearSearch}
             color="primary"
-            variant="outlined"
+            size="small"
+            sx={{ fontWeight: 600 }}
           />
         </Box>
       )}
 
       {posts.length === 0 && !loading && !searchLoading && (
-        <Typography color="text.secondary" textAlign="center" mt={4}>
-          {activeSearch
-            ? "No posts found for your search."
-            : "No posts yet. Be the first to share something! ✨"}
-        </Typography>
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 8,
+            px: 3,
+            borderRadius: 3,
+            background: "rgba(255,255,255,0.6)",
+            border: "1.5px dashed rgba(144,209,202,0.5)",
+          }}
+        >
+          <Typography variant="h4" sx={{ mb: 1, fontSize: "2.5rem" }}>
+            {activeSearch ? "🔍" : "✨"}
+          </Typography>
+          <Typography color="text.secondary" fontWeight={500}>
+            {activeSearch
+              ? "No posts found for your search."
+              : "No posts yet. Be the first to share something!"}
+          </Typography>
+        </Box>
       )}
 
       {posts.map((post, index) => (
@@ -204,8 +241,12 @@ const FeedPage: React.FC = () => {
       ))}
 
       {(loading || searchLoading) && (
-        <Box display="flex" justifyContent="center" py={3}>
-          <CircularProgress color="primary" />
+        <Box display="flex" justifyContent="center" py={4}>
+          <CircularProgress
+            size={32}
+            thickness={4}
+            sx={{ color: "primary.main" }}
+          />
         </Box>
       )}
     </Container>

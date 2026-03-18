@@ -74,25 +74,34 @@ const EditProfilePage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Typography
-        variant="h5"
-        fontWeight={700}
-        sx={(theme) => ({
-          mb: 3,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        })}
-      >
-        Edit Profile
-      </Typography>
+      {/* Heading */}
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="h5"
+          fontWeight={800}
+          sx={(theme) => ({
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.02em",
+          })}
+        >
+          Edit Profile
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+          Update your profile information
+        </Typography>
+      </Box>
 
       <Paper
+        elevation={0}
         sx={{
           p: 3,
-          background: "rgba(255, 255, 255, 0.8)",
+          background: "rgba(255, 255, 255, 0.88)",
           backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.06)",
+          border: "1px solid rgba(200, 232, 229, 0.8)",
+          borderRadius: "16px",
+          boxShadow: "0 4px 24px rgba(13, 53, 51, 0.07)",
         }}
       >
         {error && (
@@ -107,35 +116,54 @@ const EditProfilePage: React.FC = () => {
         )}
 
         <Box component="form" onSubmit={handleSubmit} textAlign="center">
-          <Avatar
-            src={getImageUrl()}
+          {/* Avatar with gradient ring */}
+          <Box
             sx={{
-              width: 100,
-              height: 100,
-              mx: "auto",
-              mb: 2,
-              border: "3px solid",
-              borderColor: "primary.main",
-              fontSize: 40,
+              display: "inline-flex",
+              justifyContent: "center",
+              mb: 0.5,
+              borderRadius: "50%",
+              p: "3px",
+              background: "linear-gradient(135deg, #129990, #096B68)",
+              boxShadow: "0 4px 18px rgba(18, 153, 144, 0.3)",
             }}
           >
-            {username?.charAt(0).toUpperCase()}
-          </Avatar>
+            <Avatar
+              src={getImageUrl()}
+              sx={{
+                width: 96,
+                height: 96,
+                border: "3px solid white",
+                fontSize: "2.2rem",
+              }}
+            >
+              {username?.charAt(0).toUpperCase()}
+            </Avatar>
+          </Box>
 
-          <Button
-            component="label"
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            sx={{ mb: 3 }}
-          >
-            Change Photo
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleImageChange}
-            />
-          </Button>
+          <Box>
+            <Button
+              component="label"
+              variant="text"
+              startIcon={<UploadIcon />}
+              size="small"
+              sx={{
+                mb: 2,
+                mt: 1,
+                color: "primary.main",
+                fontWeight: 600,
+                fontSize: "0.82rem",
+              }}
+            >
+              Change Photo
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleImageChange}
+              />
+            </Button>
+          </Box>
 
           <TextField
             label="Username"
@@ -144,6 +172,7 @@ const EditProfilePage: React.FC = () => {
             onChange={(e) => setUsername(e.target.value)}
             margin="normal"
             required
+            sx={{ textAlign: "left" }}
           />
 
           <TextField
@@ -153,6 +182,7 @@ const EditProfilePage: React.FC = () => {
             margin="normal"
             disabled
             helperText="Email cannot be changed"
+            sx={{ textAlign: "left" }}
           />
 
           <Button
@@ -161,7 +191,7 @@ const EditProfilePage: React.FC = () => {
             fullWidth
             size="large"
             disabled={loading}
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, py: 1.4, borderRadius: "12px" }}
           >
             {loading ? "Saving..." : "Save Changes"}
           </Button>

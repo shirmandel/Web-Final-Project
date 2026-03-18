@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Container,
   Typography,
-  Avatar,
-  Button,
   CircularProgress,
-  Paper,
   Divider,
+  Chip,
 } from "@mui/material";
 import PostCard from "../components/PostCard";
+import ProfileHeader from "../components/ProfileHeader";
 import { useAuth } from "../context/AuthContext";
 import type { User } from "../services/auth.service";
-import { Edit as EditIcon } from "@mui/icons-material";
 import { userService } from "../services/user.service";
 import { postService, type Post } from "../services/post.service";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 const ProfilePage: React.FC = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
@@ -48,12 +43,6 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [id]);
 
-  const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return "";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${API_URL}${imagePath}`;
-  };
-
   const handleDelete = async (postId: string) => {
     if (!window.confirm("Delete this post?")) return;
     try {
@@ -66,8 +55,8 @@ const ProfilePage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" mt={6}>
+        <CircularProgress size={36} thickness={4} sx={{ color: "primary.main" }} />
       </Box>
     );
   }
@@ -82,57 +71,23 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Paper
-        sx={{
-          p: 4,
-          mb: 3,
-          textAlign: "center",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.06)",
-        }}
-      >
-        <Avatar
-          src={getImageUrl(profile.profileImage)}
-          sx={{
-            width: 100,
-            height: 100,
-            mx: "auto",
-            mb: 2,
-            border: "3px solid",
-            borderColor: "primary.main",
-            fontSize: 40,
-          }}
-        >
-          {profile.username?.charAt(0).toUpperCase()}
-        </Avatar>
-
-        <Typography variant="h5" fontWeight={700}>
-          {profile.username}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" mb={2}>
-          {profile.email}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {posts.length} posts
-        </Typography>
-
-        {isOwnProfile && (
-          <Button
-            variant="outlined"
-            startIcon={<EditIcon />}
-            onClick={() => navigate("/edit-profile")}
-            sx={{ mt: 2 }}
-          >
-            Edit Profile
-          </Button>
-        )}
-      </Paper>
+      <ProfileHeader
+        profile={profile}
+        posts={posts}
+        isOwnProfile={isOwnProfile}
+      />
 
       <Divider sx={{ mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Posts
-        </Typography>
+        <Chip
+          label="Posts"
+          size="small"
+          sx={{
+            fontWeight: 700,
+            bgcolor: "rgba(18,153,144,0.1)",
+            color: "primary.dark",
+            border: "1px solid rgba(18,153,144,0.2)",
+          }}
+        />
       </Divider>
 
       {posts.map((post) => (
@@ -140,9 +95,22 @@ const ProfilePage: React.FC = () => {
       ))}
 
       {posts.length === 0 && (
-        <Typography color="text.secondary" textAlign="center" mt={2}>
-          No posts yet.
-        </Typography>
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 6,
+            borderRadius: 3,
+            background: "rgba(255,255,255,0.6)",
+            border: "1.5px dashed rgba(144,209,202,0.5)",
+          }}
+        >
+          <Typography variant="h4" sx={{ mb: 1, fontSize: "2rem" }}>
+            📝
+          </Typography>
+          <Typography color="text.secondary" fontWeight={500}>
+            No posts yet.
+          </Typography>
+        </Box>
       )}
     </Container>
   );

@@ -75,19 +75,37 @@ const LoginPage: React.FC = () => {
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 3.5, sm: 5 },
+          p: { xs: 4, sm: 5 },
           maxWidth: 440,
           width: "100%",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(24px)",
-          border: "1px solid rgba(124, 58, 237, 0.08)",
-          borderRadius: 3,
-          boxShadow:
-            "0 8px 40px rgba(124, 58, 237, 0.08), 0 2px 12px rgba(0,0,0,0.04)",
+          background: "rgba(255, 255, 255, 0.88)",
+          backdropFilter: "blur(28px)",
+          border: "1px solid rgba(200, 232, 229, 0.7)",
+          borderRadius: "20px",
+          boxShadow: "0 12px 48px rgba(13, 53, 51, 0.1), 0 2px 12px rgba(0,0,0,0.04)",
           position: "relative",
           zIndex: 1,
         }}
       >
+        <Box sx={{ textAlign: "center", mb: 0.5 }}>
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 52,
+              height: 52,
+              borderRadius: "14px",
+              background: "linear-gradient(135deg, #129990 0%, #096B68 100%)",
+              boxShadow: "0 6px 20px rgba(18, 153, 144, 0.4)",
+              fontSize: "1.5rem",
+              mb: 2,
+            }}
+          >
+            ✦
+          </Box>
+        </Box>
+
         <Typography
           variant="h4"
           textAlign="center"
@@ -97,20 +115,20 @@ const LoginPage: React.FC = () => {
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 800,
-            fontSize: { xs: "1.75rem", sm: "2.125rem" },
-            letterSpacing: "-0.02em",
+            fontSize: { xs: "1.75rem", sm: "2rem" },
+            letterSpacing: "-0.03em",
           })}
         >
-          Sign In
+          Welcome back
         </Typography>
 
         <Typography
           variant="body2"
           color="text.secondary"
           textAlign="center"
-          sx={{ mb: 4 }}
+          sx={{ mb: 3.5, fontSize: "0.88rem" }}
         >
-          Welcome back! Sign in to continue.
+          Sign in to continue to InstaVibe
         </Typography>
 
         {error && (
@@ -157,7 +175,7 @@ const LoginPage: React.FC = () => {
               mb: 2,
               py: 1.5,
               fontSize: "1rem",
-              position: "relative",
+              borderRadius: "12px",
             }}
             id="login-submit"
           >
@@ -169,11 +187,11 @@ const LoginPage: React.FC = () => {
           </Button>
         </Box>
 
-        <Divider sx={{ my: 2.5 }}>
+        <Divider sx={{ my: 2 }}>
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ px: 1, fontSize: "0.7rem", letterSpacing: "0.05em" }}
+            sx={{ px: 1, fontSize: "0.7rem", letterSpacing: "0.08em", fontWeight: 600 }}
           >
             OR
           </Typography>
@@ -204,10 +222,8 @@ const LoginPage: React.FC = () => {
             sx={{
               color: "primary.main",
               cursor: "pointer",
-              fontWeight: 600,
-              "&:hover": {
-                textDecoration: "underline",
-              },
+              fontWeight: 700,
+              "&:hover": { textDecoration: "underline" },
             }}
           >
             Sign Up

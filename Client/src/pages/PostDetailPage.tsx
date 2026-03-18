@@ -1,30 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
   Typography,
-  TextField,
   Button,
-  Avatar,
-  Card,
-  CardContent,
-  CardHeader,
-  IconButton,
   CircularProgress,
-  Divider,
 } from "@mui/material";
-import {
-  Delete as DeleteIcon,
-  ArrowBack as ArrowBackIcon,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { postService, type Post } from "../services/post.service";
 import { commentService, type Comment } from "../services/comment.service";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import CommentSection from "../components/CommentSection";
 
 const PostDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +20,6 @@ const PostDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -55,13 +42,12 @@ const PostDetailPage: React.FC = () => {
     fetchData();
   }, [id]);
 
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !id) return;
+  const handleAddComment = async (text: string) => {
+    if (!text.trim() || !id) return;
     setSubmitting(true);
     try {
-      const comment = await commentService.create(id, newComment);
+      const comment = await commentService.create(id, text);
       setComments((prev) => [comment, ...prev]);
-      setNewComment("");
       if (post) {
         setPost({ ...post, commentsCount: post.commentsCount + 1 });
       }
@@ -87,16 +73,10 @@ const PostDetailPage: React.FC = () => {
     }
   };
 
-  const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return "";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${API_URL}${imagePath}`;
-  };
-
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" mt={6}>
+        <CircularProgress size={36} thickness={4} sx={{ color: "primary.main" }} />
       </Box>
     );
   }
@@ -111,95 +91,37 @@ const PostDetailPage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
+      {/* Back button */}
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate(-1)}
-        sx={{ mb: 2, color: "text.secondary" }}
+        size="small"
+        sx={{
+          mb: 2.5,
+          color: "text.secondary",
+          borderRadius: "20px",
+          px: 1.5,
+          "&:hover": { bgcolor: "rgba(18,153,144,0.07)", color: "primary.main" },
+        }}
       >
         Back
       </Button>
 
       <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
+        {/* Post Card */}
         <Box sx={{ flex: "0 0 auto", width: { xs: "100%", md: "50%" } }}>
           <PostCard post={post} />
         </Box>
 
+        {/* Comments Panel */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Comments ({comments.length})
-          </Typography>
-
-          <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Write a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
-              id="comment-input"
-            />
-            <Button
-              variant="contained"
-              onClick={handleAddComment}
-              disabled={submitting || !newComment.trim()}
-              id="comment-submit"
-            >
-              Post
-            </Button>
-          </Box>
-
-          <Divider sx={{ mb: 2 }} />
-
-          <Box sx={{ maxHeight: "70vh", overflowY: "auto" }}>
-            {comments.map((comment) => (
-              <Card
-                key={comment._id}
-                sx={{ mb: 1.5, background: "background.default" }}
-              >
-                <CardHeader
-                  avatar={
-                    <Avatar
-                      src={getImageUrl(comment.owner.profileImage)}
-                      sx={{ width: 32, height: 32 }}
-                    >
-                      {comment.owner.username?.charAt(0).toUpperCase()}
-                    </Avatar>
-                  }
-                  title={
-                    <Typography variant="subtitle2" fontWeight={600}>
-                      {comment.owner.username}
-                    </Typography>
-                  }
-                  subheader={
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </Typography>
-                  }
-                  action={
-                    user?._id === comment.owner._id ? (
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteComment(comment._id)}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    ) : null
-                  }
-                />
-                <CardContent sx={{ pt: 0 }}>
-                  <Typography variant="body2">{comment.content}</Typography>
-                </CardContent>
-              </Card>
-            ))}
-
-            {comments.length === 0 && (
-              <Typography color="text.secondary" textAlign="center" mt={2}>
-                No comments yet. Be the first!
-              </Typography>
-            )}
-          </Box>
+          <CommentSection
+            comments={comments}
+            currentUserId={user?._id}
+            submitting={submitting}
+            onAddComment={handleAddComment}
+            onDeleteComment={handleDeleteComment}
+          />
         </Box>
       </Box>
     </Container>
