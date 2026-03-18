@@ -31,7 +31,7 @@ const ProfilePage: React.FC = () => {
       try {
         const [profileData, postsData] = await Promise.all([
           userService.getById(id),
-          postService.getByUser(id, 1, 50),
+          postService.getByUser(id),
         ]);
         setProfile(profileData);
         setPosts(postsData.posts);
@@ -71,7 +71,7 @@ const ProfilePage: React.FC = () => {
       <Box sx={{ width: "100%", mx: "auto" }}>
         <Divider sx={{ mb: 3 }}>
           <Chip
-            label="Posts grid"
+            label="Posts"
             size="small"
             sx={{
               fontWeight: 700,
