@@ -21,8 +21,7 @@ import {
 import { type Post } from "../services/post.service";
 import { likeService } from "../services/like.service";
 import { useAuth } from "../context/AuthContext";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "../config";
 
 interface PostCardProps {
   post: Post;

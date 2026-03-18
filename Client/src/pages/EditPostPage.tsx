@@ -12,8 +12,7 @@ import {
 } from "@mui/material";
 import { AddPhotoAlternate as PhotoIcon } from "@mui/icons-material";
 import { postService } from "../services/post.service";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "../config";
 
 const EditPostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import { type Comment } from "../services/comment.service";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "../config";
 
 interface CommentCardProps {
   comment: Comment;

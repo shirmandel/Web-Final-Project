@@ -13,8 +13,7 @@ import {
 import { CloudUpload as UploadIcon } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../services/user.service";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "../config";
 
 const EditProfilePage: React.FC = () => {
   const { user, setUser } = useAuth();

@@ -2,8 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { Favorite as HeartIcon, ModeComment as CommentIcon } from "@mui/icons-material";
 import type { Post } from "../services/post.service";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "../config";
 
 const getImageUrl = (imagePath?: string) => {
   if (!imagePath) return "";
