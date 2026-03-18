@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IPost extends Document {
   text: string;
@@ -17,11 +17,11 @@ const postSchema = new Schema<IPost>(
     },
     image: {
       type: String,
-      default: '',
+      default: "",
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     tags: {
@@ -32,24 +32,24 @@ const postSchema = new Schema<IPost>(
   {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  }
+    toObject: { virtuals: true },
+  },
 );
 
-postSchema.virtual('likesCount', {
-  ref: 'Like',
-  localField: '_id',
-  foreignField: 'postId',
-  count: true
+postSchema.virtual("likesCount", {
+  ref: "Like",
+  localField: "_id",
+  foreignField: "postId",
+  count: true,
 });
 
-postSchema.virtual('commentsCount', {
-  ref: 'Comment',
-  localField: '_id',
-  foreignField: 'postId',
-  count: true
+postSchema.virtual("commentsCount", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "postId",
+  count: true,
 });
 
-postSchema.index({ text: 'text', tags: 'text' }, { default_language: 'english' });
+postSchema.index({ tags: 1 });
 
-export default mongoose.model<IPost>('Post', postSchema);
+export default mongoose.model<IPost>("Post", postSchema);

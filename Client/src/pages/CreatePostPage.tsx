@@ -9,7 +9,7 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
-import { CloudUpload as UploadIcon } from "@mui/icons-material";
+import { AddPhotoAlternate as PhotoIcon } from "@mui/icons-material";
 import { postService } from "../services/post.service";
 
 const CreatePostPage: React.FC = () => {
@@ -54,15 +54,33 @@ const CreatePostPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Typography variant="h5" fontWeight={700} mb={3}>
-        Create Post
-      </Typography>
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="h5"
+          fontWeight={800}
+          sx={(theme) => ({
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.02em",
+          })}
+        >
+          Create Post
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+          Share something with the world ✨
+        </Typography>
+      </Box>
 
       <Paper
+        elevation={0}
         sx={{
           p: 3,
-          background: "background.paper",
+          background: "rgba(255, 255, 255, 0.88)",
           backdropFilter: "blur(20px)",
+          border: "1px solid rgba(200, 232, 229, 0.8)",
+          borderRadius: "16px",
+          boxShadow: "0 4px 24px rgba(13, 53, 51, 0.07)",
         }}
       >
         {error && (
@@ -82,23 +100,61 @@ const CreatePostPage: React.FC = () => {
             margin="normal"
             required
             id="post-text"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "12px",
+              },
+            }}
           />
 
-          <Button
+          <Box
             component="label"
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            sx={{ mt: 2, mb: 2 }}
-            fullWidth
+            htmlFor="create-image-input"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              mt: 2,
+              mb: 2,
+              py: 2.5,
+              border: "2px dashed",
+              borderColor: imagePreview
+                ? "primary.main"
+                : "rgba(144,209,202,0.7)",
+              borderRadius: "14px",
+              background: imagePreview
+                ? "rgba(18,153,144,0.04)"
+                : "rgba(240,250,249,0.5)",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                borderColor: "primary.main",
+                background: "rgba(18,153,144,0.06)",
+              },
+            }}
           >
-            Upload Image
+            <PhotoIcon
+              sx={{ fontSize: "2rem", color: "primary.light", mb: 0.75 }}
+            />
+            <Typography variant="body2" fontWeight={600} color="primary.dark">
+              {image ? `📎 ${image.name}` : "Click to upload image"}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 0.25 }}
+            >
+              PNG, JPG, WEBP supported
+            </Typography>
             <input
+              id="create-image-input"
               type="file"
               accept="image/*"
               hidden
               onChange={handleImageChange}
             />
-          </Button>
+          </Box>
 
           {imagePreview && (
             <Box sx={{ mb: 2, textAlign: "center" }}>
@@ -107,9 +163,10 @@ const CreatePostPage: React.FC = () => {
                 alt="Preview"
                 style={{
                   maxWidth: "100%",
-                  maxHeight: 300,
+                  maxHeight: 280,
                   borderRadius: 12,
                   objectFit: "cover",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
                 }}
               />
             </Box>
@@ -121,7 +178,7 @@ const CreatePostPage: React.FC = () => {
             fullWidth
             size="large"
             disabled={loading}
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, py: 1.4, borderRadius: "12px" }}
             id="post-submit"
           >
             {loading ? "Publishing..." : "Publish Post"}

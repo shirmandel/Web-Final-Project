@@ -1,123 +1,96 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Container,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Chip,
-} from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+import { Box, CircularProgress, Typography, Container } from "@mui/material";
 import { postService, type Post } from "../services/post.service";
 import PostCard from "../components/PostCard";
+import SearchSidebar from "../components/SearchSidebar";
 
 const FeedPage: React.FC = () => {
+  const LIMIT = 10;
   const [posts, setPosts] = useState<Post[]>([]);
-  const [, setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
+
   const observer = useRef<IntersectionObserver | null>(null);
+  const isFetchingRef = useRef(false);
 
-  const loadPosts = useCallback(
-    async (pageNum: number) => {
-      if (loading) return;
-      setLoading(true);
-      try {
-        const data = await postService.getAll(pageNum, 10);
-        setPosts((prev) =>
-          pageNum === 1 ? data.posts : [...prev, ...data.posts],
-        );
-        setHasMore(pageNum < data.totalPages);
-      } catch (err) {
-        console.error("Failed to load posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loading],
-  );
+  const fetchPosts = useCallback(async (pageNum: number, search: string) => {
+    if (isFetchingRef.current) return;
 
-  const searchPosts = useCallback(
-    async (query: string, pageNum: number) => {
-      if (searchLoading) return;
-      setSearchLoading(true);
-      try {
-        const data = await postService.search(query, pageNum, 10);
-        setPosts((prev) =>
-          pageNum === 1 ? data.posts : [...prev, ...data.posts],
-        );
-        setHasMore(pageNum < data.totalPages);
-      } catch (err) {
-        console.error("Search failed:", err);
-      } finally {
-        setSearchLoading(false);
-      }
-    },
-    [searchLoading],
-  );
+    isFetchingRef.current = true;
+    setLoading(true);
+
+    try {
+      const data = search
+        ? await postService.search(search, pageNum, LIMIT)
+        : await postService.getAll(pageNum, LIMIT);
+
+      setPosts((prev) => {
+        if (pageNum === 1) return data.posts;
+
+        const existingIds = new Set(prev.map((p) => p._id));
+        const uniquePosts = data.posts.filter((p) => !existingIds.has(p._id));
+        return [...prev, ...uniquePosts];
+      });
+
+      setHasMore(pageNum < data.totalPages);
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+    } finally {
+      setLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, []);
 
   useEffect(() => {
-    loadPosts(1);
-  }, []);
+    fetchPosts(page, activeSearch);
+  }, [page, activeSearch, fetchPosts]);
 
   const handleSearch = () => {
     const trimmed = searchQuery.trim();
-    if (!trimmed) {
-      if (activeSearch) {
-        setActiveSearch("");
-        setPage(1);
-        setPosts([]);
-        loadPosts(1);
-      }
-      return;
-    }
-    setActiveSearch(trimmed);
-    setPage(1);
     setPosts([]);
-    searchPosts(trimmed, 1);
+    setPage(1);
+    setHasMore(true);
+    setActiveSearch(trimmed);
   };
 
   const handleClearSearch = () => {
     setSearchQuery("");
-    setActiveSearch("");
-    setPage(1);
     setPosts([]);
-    loadPosts(1);
+    setPage(1);
+    setHasMore(true);
+    setActiveSearch("");
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  const lastPostRef = useCallback(
+  const bottomRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading || searchLoading) return;
       if (observer.current) observer.current.disconnect();
+      if (!node) return;
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => {
-            const nextPage = prev + 1;
-            if (activeSearch) {
-              searchPosts(activeSearch, nextPage);
-            } else {
-              loadPosts(nextPage);
-            }
-            return nextPage;
-          });
-        }
-      });
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
 
-      if (node) observer.current.observe(node);
+          if (
+            entry.isIntersecting &&
+            hasMore &&
+            !loading &&
+            !isFetchingRef.current &&
+            posts.length > 0
+          ) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        {
+          threshold: 1,
+        },
+      );
+
+      observer.current.observe(node);
     },
-    [loading, searchLoading, hasMore, loadPosts, searchPosts, activeSearch],
+    [hasMore, loading, posts.length],
   );
 
   const handleDelete = async (id: string) => {
@@ -131,83 +104,74 @@ const FeedPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Typography
-        variant="h5"
-        fontWeight={700}
-        sx={(theme) => ({
-          mb: 3,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        })}
-      >
-        Feed
-      </Typography>
-
-      <TextField
-        fullWidth
-        placeholder='Try "posts about food from last week"'
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Box
         sx={{
-          mb: 2,
-          "& .MuiOutlinedInput-root": {
-            background: "rgba(255, 255, 255, 0.8)",
-            backdropFilter: "blur(12px)",
-            borderRadius: 2,
-          },
+          display: "flex",
+          gap: 3,
+          alignItems: "flex-start",
+          flexDirection: { xs: "column", md: "row-reverse" },
         }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon color="action" />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={handleSearch} edge="end" aria-label="search">
-                <SearchIcon color="primary" />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      {activeSearch && (
-        <Box mb={2}>
-          <Chip
-            label={`Search: "${activeSearch}"`}
-            onDelete={handleClearSearch}
-            color="primary"
-            variant="outlined"
+      >
+        <Box
+          sx={{
+            width: { xs: "100%", md: 370 },
+            flexShrink: 0,
+            position: "sticky",
+            top: 80,
+          }}
+        >
+          <SearchSidebar
+            searchQuery={searchQuery}
+            activeSearch={activeSearch}
+            onQueryChange={setSearchQuery}
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
           />
         </Box>
-      )}
 
-      {posts.length === 0 && !loading && !searchLoading && (
-        <Typography color="text.secondary" textAlign="center" mt={4}>
-          {activeSearch
-            ? "No posts found for your search."
-            : "No posts yet. Be the first to share something! ✨"}
-        </Typography>
-      )}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {posts.length === 0 && !loading && (
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 8,
+                px: 3,
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.6)",
+                border: "1.5px dashed rgba(144,209,202,0.5)",
+              }}
+            >
+              <Typography variant="h4" sx={{ mb: 1, fontSize: "2.5rem" }}>
+                {activeSearch ? "🔍" : "✨"}
+              </Typography>
+              <Typography color="text.secondary" fontWeight={500}>
+                {activeSearch
+                  ? "No posts found for your search."
+                  : "No posts yet. Be the first to share something!"}
+              </Typography>
+            </Box>
+          )}
 
-      {posts.map((post, index) => (
-        <Box
-          key={post._id}
-          ref={index === posts.length - 1 ? lastPostRef : undefined}
-        >
-          <PostCard post={post} onDelete={handleDelete} />
+          {posts.map((post) => (
+            <Box key={post._id}>
+              <PostCard post={post} onDelete={handleDelete} />
+            </Box>
+          ))}
+
+          {posts.length > 0 && <Box ref={bottomRef} sx={{ height: 1 }} />}
+
+          {loading && (
+            <Box display="flex" justifyContent="center" py={4}>
+              <CircularProgress
+                size={32}
+                thickness={4}
+                sx={{ color: "primary.main" }}
+              />
+            </Box>
+          )}
         </Box>
-      ))}
-
-      {(loading || searchLoading) && (
-        <Box display="flex" justifyContent="center" py={3}>
-          <CircularProgress color="primary" />
-        </Box>
-      )}
+      </Box>
     </Container>
   );
 };

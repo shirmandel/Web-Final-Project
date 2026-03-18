@@ -1,65 +1,88 @@
+@keyframes floatBlob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -40px) scale(1.08); }
+  66%       { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes floatBlob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(-25px, 35px) scale(1.06); }
+  66%       { transform: translate(15px, -20px) scale(0.97); }
+}
+
+@keyframes floatBlob3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(20px, 20px) scale(1.05); }
+}
+
 .app-background {
   min-height: 100vh;
   background: linear-gradient(
-    135deg,
-    #ede9fe 0%,
-    #f0f9ff 30%,
-    #ecfdf5 60%,
-    #fdf4ff 100%
+    150deg,
+    #edfaf8 0%,
+    #f5fdfc 25%,
+    #ffffff 55%,
+    #f0f9ff 80%,
+    #eef7f6 100%
   );
   position: relative;
-  overflow: hidden;
+  overflow: clip;
 }
 
-.app-background::before,
-.app-background::after,
-.app-background .app-blob {
+/* Top-left teal blob */
+.app-background::before {
   content: "";
   position: fixed;
+  top: -12%;
+  left: -6%;
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(18, 153, 144, 0.14) 0%,
+    transparent 70%
+  );
+  filter: blur(60px);
   pointer-events: none;
+  animation: floatBlob1 14s ease-in-out infinite;
 }
 
-.app-background::before {
-  top: -15%;
-  left: -8%;
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(
-    circle,
-    rgba(124, 58, 237, 0.12) 0%,
-    transparent 70%
-  );
-  filter: blur(50px);
-}
-
+/* Bottom-right cyan blob */
 .app-background::after {
-  bottom: -12%;
-  right: -5%;
-  width: 380px;
-  height: 380px;
+  content: "";
+  position: fixed;
+  bottom: -10%;
+  right: -4%;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(6, 182, 212, 0.1) 0%,
+    rgba(6, 182, 212, 0.11) 0%,
     transparent 70%
   );
-  filter: blur(50px);
+  filter: blur(55px);
+  pointer-events: none;
+  animation: floatBlob2 18s ease-in-out infinite;
 }
 
+/* Mid-page accent blob */
 .app-blob {
   position: fixed;
-  top: 40%;
-  right: 15%;
-  width: 250px;
-  height: 250px;
+  top: 38%;
+  right: 12%;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(244, 114, 182, 0.08) 0%,
+    rgba(144, 209, 202, 0.1) 0%,
     transparent 70%
   );
-  filter: blur(40px);
+  filter: blur(50px);
   pointer-events: none;
+  animation: floatBlob3 22s ease-in-out infinite;
 }
 
 .app-content {

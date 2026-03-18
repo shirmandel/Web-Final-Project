@@ -15,6 +15,7 @@ import {
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleGoogleRegister = () => {};
+
 
   return (
     <Box
@@ -93,19 +94,19 @@ const RegisterPage: React.FC = () => {
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 3.5, sm: 5 },
+          p: { xs: 4, sm: 5 },
           maxWidth: 440,
           width: "100%",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(24px)",
-          border: "1px solid rgba(124, 58, 237, 0.08)",
-          borderRadius: 3,
-          boxShadow:
-            "0 8px 40px rgba(124, 58, 237, 0.08), 0 2px 12px rgba(0,0,0,0.04)",
+          background: "rgba(255, 255, 255, 0.88)",
+          backdropFilter: "blur(28px)",
+          border: "1px solid rgba(200, 232, 229, 0.7)",
+          borderRadius: "20px",
+          boxShadow: "0 12px 48px rgba(13, 53, 51, 0.1), 0 2px 12px rgba(0,0,0,0.04)",
           position: "relative",
           zIndex: 1,
         }}
       >
+
         <Typography
           variant="h4"
           textAlign="center"
@@ -115,20 +116,20 @@ const RegisterPage: React.FC = () => {
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 800,
-            fontSize: { xs: "1.75rem", sm: "2.125rem" },
-            letterSpacing: "-0.02em",
+            fontSize: { xs: "1.75rem", sm: "2rem" },
+            letterSpacing: "-0.03em",
           })}
         >
-          Sign Up
+          Create account
         </Typography>
 
         <Typography
           variant="body2"
           color="text.secondary"
           textAlign="center"
-          sx={{ mb: 4 }}
+          sx={{ mb: 3.5, fontSize: "0.88rem" }}
         >
-          Create your account and get started.
+          Join InstaVibe and start sharing
         </Typography>
 
         {error && (
@@ -142,20 +143,29 @@ const RegisterPage: React.FC = () => {
           </Alert>
         )}
 
-        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
           <Box sx={{ position: "relative", display: "inline-block" }}>
-            <Avatar
-              src={profilePreview ?? undefined}
+            <Box
               sx={{
-                width: 88,
-                height: 88,
-                border: "3px solid",
-                borderColor: "primary.light",
-                fontSize: "2rem",
+                borderRadius: "50%",
+                p: "3px",
+                background: "linear-gradient(135deg, #129990, #096B68)",
+                display: "inline-block",
+                boxShadow: "0 4px 16px rgba(18, 153, 144, 0.3)",
               }}
             >
-              {!profilePreview && username ? username[0].toUpperCase() : null}
-            </Avatar>
+              <Avatar
+                src={profilePreview ?? undefined}
+                sx={{
+                  width: 80,
+                  height: 80,
+                  border: "3px solid white",
+                  fontSize: "1.8rem",
+                }}
+              >
+                {!profilePreview && username ? username[0].toUpperCase() : null}
+              </Avatar>
+            </Box>
             <Tooltip title="Upload profile picture">
               <IconButton
                 size="small"
@@ -167,11 +177,12 @@ const RegisterPage: React.FC = () => {
                   bgcolor: "primary.main",
                   color: "white",
                   "&:hover": { bgcolor: "primary.dark" },
-                  width: 28,
-                  height: 28,
+                  width: 26,
+                  height: 26,
+                  border: "2px solid white",
                 }}
               >
-                <AddAPhotoIcon sx={{ fontSize: 15 }} />
+                <AddAPhotoIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Tooltip>
             <input
@@ -238,7 +249,7 @@ const RegisterPage: React.FC = () => {
               mb: 2,
               py: 1.5,
               fontSize: "1rem",
-              position: "relative",
+              borderRadius: "12px",
             }}
             id="register-submit"
           >
@@ -250,43 +261,15 @@ const RegisterPage: React.FC = () => {
           </Button>
         </Box>
 
-        <Divider sx={{ my: 2.5 }}>
+        <Divider sx={{ my: 2 }}>
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ px: 1, fontSize: "0.7rem", letterSpacing: "0.05em" }}
+            sx={{ px: 1, fontSize: "0.7rem", letterSpacing: "0.08em", fontWeight: 600 }}
           >
             OR
           </Typography>
         </Divider>
-
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={handleGoogleRegister}
-          sx={{
-            py: 1.3,
-            mb: 3,
-            borderColor: "#E2E8F0",
-            color: "text.primary",
-            borderRadius: "10px",
-            fontSize: "0.9rem",
-            backgroundColor: "#FFFFFF",
-            "&:hover": {
-              borderColor: "#A78BFA",
-              backgroundColor: "#FAFAFF",
-            },
-          }}
-          id="register-google"
-        >
-          <Box
-            component="img"
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            alt="Google"
-            sx={{ width: 20, height: 20, mr: 1.5 }}
-          />
-          Continue with Google
-        </Button>
 
         <Typography
           variant="body2"
@@ -301,10 +284,8 @@ const RegisterPage: React.FC = () => {
             sx={{
               color: "primary.main",
               cursor: "pointer",
-              fontWeight: 600,
-              "&:hover": {
-                textDecoration: "underline",
-              },
+              fontWeight: 700,
+              "&:hover": { textDecoration: "underline" },
             }}
           >
             Sign In

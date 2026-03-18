@@ -1,73 +1,132 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
   Typography,
-  Avatar,
-  Button,
   CircularProgress,
-  Paper,
   Divider,
+  Chip,
 } from "@mui/material";
-import PostCard from "../components/PostCard";
+import ProfileHeader from "../components/ProfileHeader";
+import ProfileGridPost from "../components/ProfileGridPost";
 import { useAuth } from "../context/AuthContext";
 import type { User } from "../services/auth.service";
-import { Edit as EditIcon } from "@mui/icons-material";
 import { userService } from "../services/user.service";
 import { postService, type Post } from "../services/post.service";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const LIMIT = 9;
 
 const ProfilePage: React.FC = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
+
   const [profile, setProfile] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const isFetchingRef = useRef(false);
 
   const isOwnProfile = currentUser?._id === id;
+
+  const fetchPosts = useCallback(async (userId: string, pageNum: number) => {
+    if (isFetchingRef.current) return;
+
+    isFetchingRef.current = true;
+    setPostsLoading(true);
+
+    try {
+      const postsData = await postService.getByUser(userId, pageNum, LIMIT);
+
+      setPosts((prev) => {
+        const incoming = postsData.posts ?? [];
+
+        if (pageNum === 1) return incoming;
+
+        const existingIds = new Set(prev.map((p) => p._id));
+        const uniqueIncoming = incoming.filter((p) => !existingIds.has(p._id));
+        return [...prev, ...uniqueIncoming];
+      });
+
+      setHasMore(pageNum < postsData.totalPages);
+    } catch (err) {
+      console.error("Failed to load user posts:", err);
+    } finally {
+      setPostsLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (!id) return;
+
+      setProfileLoading(true);
+      setPosts([]);
+      setPage(1);
+      setHasMore(true);
+
       try {
-        const [profileData, postsData] = await Promise.all([
-          userService.getById(id),
-          postService.getByUser(id, 1, 50),
-        ]);
+        const profileData = await userService.getById(id);
         setProfile(profileData);
-        setPosts(postsData.posts);
       } catch (err) {
         console.error("Failed to load profile:", err);
+        setProfile(null);
       } finally {
-        setLoading(false);
+        setProfileLoading(false);
       }
     };
+
     fetchProfile();
   }, [id]);
 
-  const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return "";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${API_URL}${imagePath}`;
-  };
+  useEffect(() => {
+    if (!id || !profile) return;
+    fetchPosts(id, page);
+  }, [id, profile, page, fetchPosts]);
 
-  const handleDelete = async (postId: string) => {
-    if (!window.confirm("Delete this post?")) return;
-    try {
-      await postService.delete(postId);
-      setPosts((prev) => prev.filter((p) => p._id !== postId));
-    } catch (err) {
-      console.error("Failed to delete:", err);
-    }
-  };
+  const bottomRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observer.current) observer.current.disconnect();
+      if (!node) return;
 
-  if (loading) {
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+
+          if (
+            entry.isIntersecting &&
+            hasMore &&
+            !postsLoading &&
+            !isFetchingRef.current &&
+            posts.length > 0
+          ) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        {
+          threshold: 1,
+        },
+      );
+
+      observer.current.observe(node);
+    },
+    [hasMore, postsLoading, posts.length],
+  );
+
+  if (profileLoading) {
     return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" mt={6}>
+        <CircularProgress
+          size={36}
+          thickness={4}
+          sx={{ color: "primary.main" }}
+        />
       </Box>
     );
   }
@@ -81,69 +140,78 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Paper
-        sx={{
-          p: 4,
-          mb: 3,
-          textAlign: "center",
-          background: "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.06)",
-        }}
-      >
-        <Avatar
-          src={getImageUrl(profile.profileImage)}
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <ProfileHeader
+        profile={profile}
+        posts={posts}
+        isOwnProfile={isOwnProfile}
+      />
+
+      <Box sx={{ width: "100%", mx: "auto" }}>
+        <Divider sx={{ mb: 3 }}>
+          <Chip
+            label="Posts"
+            size="small"
+            sx={{
+              fontWeight: 700,
+              bgcolor: "rgba(18,153,144,0.1)",
+              color: "primary.dark",
+              border: "1px solid rgba(18,153,144,0.2)",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              fontSize: "0.65rem",
+            }}
+          />
+        </Divider>
+
+        <Box
           sx={{
-            width: 100,
-            height: 100,
-            mx: "auto",
-            mb: 2,
-            border: "3px solid",
-            borderColor: "primary.main",
-            fontSize: 40,
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: { xs: 0.5, sm: 2 },
           }}
         >
-          {profile.username?.charAt(0).toUpperCase()}
-        </Avatar>
+          {posts.map((post) => (
+            <ProfileGridPost
+              key={post._id}
+              post={post}
+              onClick={() => navigate(`/post/${post._id}`)}
+            />
+          ))}
+        </Box>
 
-        <Typography variant="h5" fontWeight={700}>
-          {profile.username}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" mb={2}>
-          {profile.email}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {posts.length} posts
-        </Typography>
+        {posts.length > 0 && <Box ref={bottomRef} sx={{ height: 1 }} />}
 
-        {isOwnProfile && (
-          <Button
-            variant="outlined"
-            startIcon={<EditIcon />}
-            onClick={() => navigate("/edit-profile")}
-            sx={{ mt: 2 }}
-          >
-            Edit Profile
-          </Button>
+        {postsLoading && (
+          <Box display="flex" justifyContent="center" py={4}>
+            <CircularProgress
+              size={32}
+              thickness={4}
+              sx={{ color: "primary.main" }}
+            />
+          </Box>
         )}
-      </Paper>
 
-      <Divider sx={{ mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Posts
-        </Typography>
-      </Divider>
-
-      {posts.map((post) => (
-        <PostCard key={post._id} post={post} onDelete={handleDelete} />
-      ))}
-
-      {posts.length === 0 && (
-        <Typography color="text.secondary" textAlign="center" mt={2}>
-          No posts yet.
-        </Typography>
-      )}
+        {posts.length === 0 && !postsLoading && (
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 6,
+              borderRadius: 3,
+              background: "rgba(255,255,255,0.6)",
+              border: "1.5px dashed rgba(144,209,202,0.5)",
+              mt: 2,
+            }}
+          >
+            <Typography variant="h4" sx={{ mb: 1, fontSize: "2rem" }}>
+              📝
+            </Typography>
+            <Typography color="text.secondary" fontWeight={500}>
+              No posts yet.
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </Container>
   );
 };
