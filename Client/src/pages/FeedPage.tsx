@@ -1,113 +1,95 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Container,
-} from "@mui/material";
+import { Box, CircularProgress, Typography, Container } from "@mui/material";
 import { postService, type Post } from "../services/post.service";
 import PostCard from "../components/PostCard";
 import SearchSidebar from "../components/SearchSidebar";
 
 const FeedPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [, setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
+
   const observer = useRef<IntersectionObserver | null>(null);
+  const isFetchingRef = useRef(false);
 
-  const loadPosts = useCallback(
-    async (pageNum: number) => {
-      if (loading) return;
-      setLoading(true);
-      try {
-        const data = await postService.getAll(pageNum, 10);
-        setPosts((prev) =>
-          pageNum === 1 ? data.posts : [...prev, ...data.posts],
-        );
-        setHasMore(pageNum < data.totalPages);
-      } catch (err) {
-        console.error("Failed to load posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loading],
-  );
+  const fetchPosts = useCallback(async (pageNum: number, search: string) => {
+    if (isFetchingRef.current) return;
 
-  const searchPosts = useCallback(
-    async (query: string, pageNum: number) => {
-      if (searchLoading) return;
-      setSearchLoading(true);
-      try {
-        const data = await postService.search(query, pageNum, 10);
-        setPosts((prev) =>
-          pageNum === 1 ? data.posts : [...prev, ...data.posts],
-        );
-        setHasMore(pageNum < data.totalPages);
-      } catch (err) {
-        console.error("Search failed:", err);
-      } finally {
-        setSearchLoading(false);
-      }
-    },
-    [searchLoading],
-  );
+    isFetchingRef.current = true;
+    setLoading(true);
+
+    try {
+      const data = search
+        ? await postService.search(search, pageNum, 10)
+        : await postService.getAll(pageNum, 10);
+
+      setPosts((prev) => {
+        if (pageNum === 1) return data.posts;
+
+        const existingIds = new Set(prev.map((p) => p._id));
+        const uniquePosts = data.posts.filter((p) => !existingIds.has(p._id));
+        return [...prev, ...uniquePosts];
+      });
+
+      setHasMore(pageNum < data.totalPages);
+    } catch (err) {
+      console.error("Failed to load posts:", err);
+    } finally {
+      setLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, []);
 
   useEffect(() => {
-    loadPosts(1);
-  }, []);
+    fetchPosts(page, activeSearch);
+  }, [page, activeSearch, fetchPosts]);
 
   const handleSearch = () => {
     const trimmed = searchQuery.trim();
-    if (!trimmed) {
-      if (activeSearch) {
-        setActiveSearch("");
-        setPage(1);
-        setPosts([]);
-        loadPosts(1);
-      }
-      return;
-    }
-    setActiveSearch(trimmed);
-    setPage(1);
     setPosts([]);
-    searchPosts(trimmed, 1);
+    setPage(1);
+    setHasMore(true);
+    setActiveSearch(trimmed);
   };
 
   const handleClearSearch = () => {
     setSearchQuery("");
-    setActiveSearch("");
-    setPage(1);
     setPosts([]);
-    loadPosts(1);
+    setPage(1);
+    setHasMore(true);
+    setActiveSearch("");
   };
 
-  const lastPostRef = useCallback(
+  const bottomRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading || searchLoading) return;
       if (observer.current) observer.current.disconnect();
+      if (!node) return;
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => {
-            const nextPage = prev + 1;
-            if (activeSearch) {
-              searchPosts(activeSearch, nextPage);
-            } else {
-              loadPosts(nextPage);
-            }
-            return nextPage;
-          });
-        }
-      });
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
 
-      if (node) observer.current.observe(node);
+          if (
+            entry.isIntersecting &&
+            hasMore &&
+            !loading &&
+            !isFetchingRef.current &&
+            posts.length > 0
+          ) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        {
+          threshold: 1,
+        },
+      );
+
+      observer.current.observe(node);
     },
-    [loading, searchLoading, hasMore, loadPosts, searchPosts, activeSearch],
+    [hasMore, loading, posts.length],
   );
 
   const handleDelete = async (id: string) => {
@@ -134,7 +116,6 @@ const FeedPage: React.FC = () => {
           sx={{
             width: { xs: "100%", md: 370 },
             flexShrink: 0,
-            display: { xs: "block", md: "block" },
             position: "sticky",
             top: 80,
           }}
@@ -149,7 +130,7 @@ const FeedPage: React.FC = () => {
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          {posts.length === 0 && !loading && !searchLoading && (
+          {posts.length === 0 && !loading && (
             <Box
               sx={{
                 textAlign: "center",
@@ -171,16 +152,15 @@ const FeedPage: React.FC = () => {
             </Box>
           )}
 
-          {posts.map((post, index) => (
-            <Box
-              key={post._id}
-              ref={index === posts.length - 1 ? lastPostRef : undefined}
-            >
+          {posts.map((post) => (
+            <Box key={post._id}>
               <PostCard post={post} onDelete={handleDelete} />
             </Box>
           ))}
 
-          {(loading || searchLoading) && (
+          {posts.length > 0 && <Box ref={bottomRef} sx={{ height: 1 }} />}
+
+          {loading && (
             <Box display="flex" justifyContent="center" py={4}>
               <CircularProgress
                 size={32}
