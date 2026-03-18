@@ -94,7 +94,6 @@ const FeedPage: React.FC = () => {
   );
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
       await postService.delete(id);
       setPosts((prev) => prev.filter((p) => p._id !== id));
