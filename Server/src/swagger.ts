@@ -11,8 +11,8 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
-        description: "Development server",
+        url: "/",
+        description: "Current server",
       },
     ],
     components: {
@@ -40,6 +40,11 @@ const options: swaggerJsdoc.Options = {
             text: { type: "string", example: "My first post!" },
             image: { type: "string", example: "/uploads/photo.jpg" },
             owner: { $ref: "#/components/schemas/User" },
+            tags: {
+              type: "array",
+              items: { type: "string" },
+              example: ["travel", "photography", "nature"],
+            },
             likesCount: { type: "integer", example: 5 },
             commentsCount: { type: "integer", example: 3 },
             createdAt: {

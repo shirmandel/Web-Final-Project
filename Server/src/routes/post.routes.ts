@@ -13,13 +13,66 @@ import upload from "../middleware/upload.middleware";
 
 const router = Router();
 
-router.post("/search", authMiddleware, searchPosts);
 /**
  * @swagger
  * tags:
  *   name: Posts
  *   description: Post management endpoints
  */
+
+/**
+ * @swagger
+ * /api/posts/search:
+ *   post:
+ *     summary: Search posts using natural language query
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - query
+ *             properties:
+ *               query:
+ *                 type: string
+ *                 description: Natural language search query
+ *                 example: "posts about travel from last week"
+ *     responses:
+ *       200:
+ *         description: Search results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 posts:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Post'
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalPosts:
+ *                   type: integer
+ *                   example: 50
+ *                 parsedQuery:
+ *                   type: object
+ *                   description: AI-parsed search parameters
+ *       400:
+ *         description: Search query is required
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.post("/search", authMiddleware, searchPosts);
 
 /**
  * @swagger
