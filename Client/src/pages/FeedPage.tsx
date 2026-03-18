@@ -4,14 +4,10 @@ import {
   CircularProgress,
   Typography,
   Container,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Chip,
 } from "@mui/material";
-import { Search as SearchIcon, Close as CloseIcon } from "@mui/icons-material";
 import { postService, type Post } from "../services/post.service";
 import PostCard from "../components/PostCard";
+import SearchSidebar from "../components/SearchSidebar";
 
 const FeedPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -90,12 +86,6 @@ const FeedPage: React.FC = () => {
     loadPosts(1);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
   const lastPostRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (loading || searchLoading) return;
@@ -131,124 +121,76 @@ const FeedPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="h5"
-          fontWeight={800}
-          sx={(theme) => ({
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            letterSpacing: "-0.02em",
-          })}
-        >
-          Your Feed
-        </Typography>
-      </Box>
-
-      <TextField
-        fullWidth
-        placeholder='Search posts...'
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Box
         sx={{
-          mb: 2.5,
-          "& .MuiOutlinedInput-root": {
-            background: "rgba(255, 255, 255, 0.9)",
-            backdropFilter: "blur(12px)",
-            borderRadius: "30px",
-            boxShadow: "0 2px 12px rgba(13, 53, 51, 0.08)",
-            "& fieldset": { borderColor: "rgba(144, 209, 202, 0.6)" },
-            "&:hover fieldset": { borderColor: "primary.main" },
-          },
+          display: "flex",
+          gap: 3,
+          alignItems: "flex-start",
+          flexDirection: { xs: "column", md: "row-reverse" },
         }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon sx={{ color: "text.secondary", fontSize: "1.2rem", ml: 0.5 }} />
-            </InputAdornment>
-          ),
-          endAdornment: searchQuery ? (
-            <InputAdornment position="end">
-              <IconButton
-                size="small"
-                onClick={handleClearSearch}
-                sx={{ mr: 0.5, color: "text.secondary" }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                onClick={handleSearch}
-                size="small"
-                sx={{
-                  bgcolor: "primary.main",
-                  color: "white",
-                  mr: 0.5,
-                  borderRadius: "8px",
-                  "&:hover": { bgcolor: "primary.dark" },
-                }}
-              >
-                <SearchIcon fontSize="small" />
-              </IconButton>
-            </InputAdornment>
-          ) : null,
-        }}
-      />
-
-      {activeSearch && (
-        <Box mb={2.5}>
-          <Chip
-            label={`Results for "${activeSearch}"`}
-            onDelete={handleClearSearch}
-            color="primary"
-            size="small"
-            sx={{ fontWeight: 600 }}
-          />
-        </Box>
-      )}
-
-      {posts.length === 0 && !loading && !searchLoading && (
+      >
         <Box
           sx={{
-            textAlign: "center",
-            py: 8,
-            px: 3,
-            borderRadius: 3,
-            background: "rgba(255,255,255,0.6)",
-            border: "1.5px dashed rgba(144,209,202,0.5)",
+            width: { xs: "100%", md: 370 },
+            flexShrink: 0,
+            display: { xs: "block", md: "block" },
+            position: "sticky",
+            top: 80,
           }}
         >
-          <Typography variant="h4" sx={{ mb: 1, fontSize: "2.5rem" }}>
-            {activeSearch ? "🔍" : "✨"}
-          </Typography>
-          <Typography color="text.secondary" fontWeight={500}>
-            {activeSearch
-              ? "No posts found for your search."
-              : "No posts yet. Be the first to share something!"}
-          </Typography>
-        </Box>
-      )}
-
-      {posts.map((post, index) => (
-        <Box
-          key={post._id}
-          ref={index === posts.length - 1 ? lastPostRef : undefined}
-        >
-          <PostCard post={post} onDelete={handleDelete} />
-        </Box>
-      ))}
-
-      {(loading || searchLoading) && (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress
-            size={32}
-            thickness={4}
-            sx={{ color: "primary.main" }}
+          <SearchSidebar
+            searchQuery={searchQuery}
+            activeSearch={activeSearch}
+            onQueryChange={setSearchQuery}
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
           />
         </Box>
-      )}
+
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {posts.length === 0 && !loading && !searchLoading && (
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 8,
+                px: 3,
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.6)",
+                border: "1.5px dashed rgba(144,209,202,0.5)",
+              }}
+            >
+              <Typography variant="h4" sx={{ mb: 1, fontSize: "2.5rem" }}>
+                {activeSearch ? "🔍" : "✨"}
+              </Typography>
+              <Typography color="text.secondary" fontWeight={500}>
+                {activeSearch
+                  ? "No posts found for your search."
+                  : "No posts yet. Be the first to share something!"}
+              </Typography>
+            </Box>
+          )}
+
+          {posts.map((post, index) => (
+            <Box
+              key={post._id}
+              ref={index === posts.length - 1 ? lastPostRef : undefined}
+            >
+              <PostCard post={post} onDelete={handleDelete} />
+            </Box>
+          ))}
+
+          {(loading || searchLoading) && (
+            <Box display="flex" justifyContent="center" py={4}>
+              <CircularProgress
+                size={32}
+                thickness={4}
+                sx={{ color: "primary.main" }}
+              />
+            </Box>
+          )}
+        </Box>
+      </Box>
     </Container>
   );
 };
